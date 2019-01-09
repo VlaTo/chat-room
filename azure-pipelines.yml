@@ -9,11 +9,17 @@ jobs:
     outputDirectory: '$(build.binariesDirectory)/$(buildConfiguration)'
 
   steps:
-  - task: NuGetToolInstaller@0
+# - task: NuGetToolInstaller@0
 
-  - task: NuGetCommand@2
+# - task: NuGetCommand@2
+#    inputs:
+#      restoreSolution: '**/*.sln'
+
+  - task: MSBuild@1
     inputs:
-      restoreSolution: '**/*.sln'
+      solution: '**/*.sln'
+      configuration: '$(buildConfiguration)'
+      msbuildArguments: '/t:restore'
 
   - task: XamarinAndroid@1
     inputs:
