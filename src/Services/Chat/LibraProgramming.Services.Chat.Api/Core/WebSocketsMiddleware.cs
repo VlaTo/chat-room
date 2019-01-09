@@ -1,0 +1,97 @@
+﻿using System;
+using System.IO;
+using System.Net.WebSockets;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
+
+namespace LibraProgramming.ChatRoom.Services.Chat.Api.Core
+{
+    public class WebSocketsMiddleware
+    {
+        private readonly RequestDelegate next;
+        private readonly WebSocketHandler socketHandler;
+
+        public WebSocketsMiddleware(RequestDelegate next, WebSocketHandler socketHandler)
+        {
+            this.next = next;
+            this.socketHandler = socketHandler;
+            ;
+        }
+
+        public Task Invoke(HttpContext context)
+        {
+            if (false == context.WebSockets.IsWebSocketRequest)
+            {
+                return next.Invoke(context);
+            }
+
+            if (false == socketHandler.CanAccept(context.Request))
+            {
+                return next.Invoke(context);
+            }
+
+            return HandleWebSocket(context);
+        }
+
+        private async Task HandleWebSocket(HttpContext context)
+        {
+            var socket = await context.WebSockets.AcceptWebSocketAsync();
+
+            await socketHandler.OnConnectAsync(socket);
+
+            await ReceiveAsync(socket, context.RequestAborted, async (message, result) =>
+            {
+                switch (result.MessageType)
+                {
+                    case WebSocketMessageType.Binary:
+                    {
+                        await socketHandler.OnBinaryAsync(socket, message);
+                        break;
+                    }
+
+                    case WebSocketMessageType.Text:
+                    {
+                        var text = Encoding.UTF8.GetString(message.Array);
+                        await socketHandler.OnTextAsync(socket, text);
+                        break;
+                    }
+                    
+                    case WebSocketMessageType.Close:
+                    {
+                        await socketHandler.OnDisconnectAsync(socket);
+                        break;
+                    }
+                }
+            });
+        }
+
+        private static async Task ReceiveAsync(WebSocket socket, CancellationToken ct, Func<ArraySegment<byte>, WebSocketReceiveResult, Task> handler)
+        {
+            while (WebSocketState.Open == socket.State)
+            {
+                ArraySegment<byte> message;
+                WebSocketReceiveResult result;
+
+                using (var stream = new MemoryStream())
+                {
+                    var buffer = new ArraySegment<byte>(new byte[8192]);
+
+                    do
+                    {
+                        result = await socket.ReceiveAsync(buffer, ct);
+                        await stream.WriteAsync(buffer.Array, buffer.Offset, result.Count, ct);
+                    }
+                    while (false == result.EndOfMessage);
+
+                    ct.ThrowIfCancellationRequested();
+
+                    message = new ArraySegment<byte>(stream.ToArray());
+                }
+
+                await handler.Invoke(message, result);
+            }
+        }
+    }
+}

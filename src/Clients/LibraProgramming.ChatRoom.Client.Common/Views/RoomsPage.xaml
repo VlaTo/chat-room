@@ -1,0 +1,56 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<views:SetupAwareContentPage
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:views="clr-namespace:LibraProgramming.ChatRoom.Client.Common.Views"
+    x:Class="LibraProgramming.ChatRoom.Client.Common.Views.RoomsPage"
+    x:Name="BrowseItemsPage"
+    BindingContext="{Binding Path=RoomsPageViewModel, Source={StaticResource ViewModelLocator}}"
+    Title="{Binding Path=Title}">
+    <ContentPage.ToolbarItems>
+        <ToolbarItem
+            Text="Add"
+            Clicked="OnAddRoomClicked">
+            <ToolbarItem.Icon>
+                <OnPlatform x:TypeArguments="FileImageSource">
+                    <On Platform="UWP" Value="add.png" />
+                </OnPlatform>
+            </ToolbarItem.Icon>
+        </ToolbarItem>
+    </ContentPage.ToolbarItems>
+    <ContentPage.Content>
+        <StackLayout>
+            <ListView
+                x:Name="ItemsListView" 
+                ItemsSource="{Binding Path=Rooms}"
+                VerticalOptions="FillAndExpand"
+                HasUnevenRows="true"
+                RefreshCommand="{Binding Path=LoadItemsCommand}"
+                IsPullToRefreshEnabled="true"
+                IsRefreshing="{Binding Path=IsBusy, Mode=OneWay}"
+                CachingStrategy="RecycleElement"
+                ItemSelected="OnItemSelected">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <ViewCell>
+                            <StackLayout Padding="10">
+                                <Label
+                                    Text="{Binding Path=Title}"
+                                    LineBreakMode="NoWrap" 
+                                    Style="{DynamicResource ListItemTextStyle}"
+                                    FontSize="16"
+                                />
+                                <Label
+                                    Text="{Binding Path=Description}"
+                                    LineBreakMode="NoWrap"
+                                    Style="{DynamicResource ListItemDetailTextStyle}"
+                                    FontSize="13"
+                                />
+                            </StackLayout>
+                        </ViewCell>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </StackLayout>
+    </ContentPage.Content>
+</views:SetupAwareContentPage>

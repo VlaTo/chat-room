@@ -1,0 +1,54 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<views:SetupAwareContentPage
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:views="clr-namespace:LibraProgramming.ChatRoom.Client.Common.Views"
+    x:Class="LibraProgramming.ChatRoom.Client.Common.Views.ChatPage"
+    Title="{Binding Path=Title}">
+    <StackLayout Spacing="20" Padding="15">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <ListView
+                Grid.Row="0"
+                ItemsSource="{Binding Path=Messages}"
+                CachingStrategy="RecycleElement"
+                VerticalOptions="StartAndExpand"
+                HorizontalOptions="Fill">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <ViewCell>
+                            <Frame
+                                BorderColor="Black"
+                                BackgroundColor="AntiqueWhite">
+                                <Label
+                                    Margin="4"
+                                    Text="{Binding Path=Content, Mode=OneTime}"
+                                />
+                            </Frame>
+                        </ViewCell>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+            <Grid
+                Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Entry
+                    Grid.Column="0"
+                    FontSize="Small"
+                    Text="{Binding Path=Text, Mode=TwoWay}"
+                />
+                <Button
+                    Grid.Column="1"
+                    Command="{Binding Path=Send, Mode=OneTime}"
+                    Text="Send"
+                />
+            </Grid>
+        </Grid>
+    </StackLayout>
+</views:SetupAwareContentPage>
