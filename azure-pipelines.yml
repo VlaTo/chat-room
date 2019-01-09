@@ -1,17 +1,65 @@
-# ASP.NET Core
-# Build and test ASP.NET Core projects targeting .NET Core.
-# Add steps that run tests, create a NuGet package, deploy, and more:
-# https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core
+jobs:
 
-trigger:
-- master
+- job: Android
+  pool:
+    vmImage: 'VS2017-Win2016'
 
-pool:
-  vmImage: 'Ubuntu-16.04'
+  variables:
+    buildConfiguration: 'Release'
+    outputDirectory: '$(build.binariesDirectory)/$(buildConfiguration)'
 
-variables:
-  buildConfiguration: 'Release'
+  steps:
+  - task: MSBuild@1
+    inputs:
+      solution: '**/*.sln'
+      configuration: '$(buildConfiguration)'
+      msbuildArguments: '/t:restore'
 
-steps:
-- script: dotnet build --configuration $(buildConfiguration)
-  displayName: 'dotnet build $(buildConfiguration)'
+  - task: XamarinAndroid@1
+    inputs:
+      projectFile: '**/*droid*.csproj'
+      outputDirectory: '$(outputDirectory)'
+      configuration: '$(buildConfiguration)'
+
+  - task: AndroidSigning@3
+    inputs:
+      apksign: false
+      zipalign: false
+      apkFiles: '$(outputDirectory)/*.apk'
+
+  - task: PublishBuildArtifacts@1
+    inputs:
+      pathtoPublish: '$(outputDirectory)'
+
+- job: Chat_API
+  pool:
+    vmImage: 'vs2017-win2016'
+
+  variables:
+    buildConfiguration: 'Release'
+    outputDirectory: '$(build.binariesDirectory)/$(buildConfiguration)'
+
+  steps:
+  - task: MSBuild@1
+    inputs:
+      solution: '**/*.sln'
+      configuration: '$(buildConfiguration)'
+      msbuildArguments: '/t:restore'
+
+  - task: DotNetCoreCLI@2
+    inputs:
+      command: 'build'
+      projects: 'src/**/Web.Api.csproj'
+      configuration: '$(BuildConfiguration)'
+
+# pool:
+#  vmImage: 'vs2017-win2016'
+
+# variables:
+#  buildConfiguration: 'Release'
+
+# steps:
+# - script: set
+# - script: $("tool.vstools")VsMSBuildCmd.bat /t:restore
+# - script: dotnet build --configuration $(buildConfiguration)
+#  displayName: 'dotnet build $(buildConfiguration)'
