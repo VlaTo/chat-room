@@ -40,10 +40,16 @@ jobs:
     outputDirectory: '$(build.binariesDirectory)/$(buildConfiguration)'
 
   steps:
+  - task: MSBuild@1
+    inputs:
+      solution: '**/*.sln'
+      configuration: '$(buildConfiguration)'
+      msbuildArguments: '/t:restore'
+
   - task: DotNetCoreCLI@2
     inputs:
       command: 'build'
-      projects: '**/Web.Api.csproj;**/Chat.Silo.csproj'
+      projects: 'src/**/Web.Api.csproj'
       configuration: '$(BuildConfiguration)'
 
 # pool:
