@@ -9,12 +9,6 @@ jobs:
     outputDirectory: '$(build.binariesDirectory)/$(buildConfiguration)'
 
   steps:
-# - task: NuGetToolInstaller@0
-
-# - task: NuGetCommand@2
-#    inputs:
-#      restoreSolution: '**/*.sln'
-
   - task: MSBuild@1
     inputs:
       solution: '**/*.sln'
@@ -36,6 +30,21 @@ jobs:
   - task: PublishBuildArtifacts@1
     inputs:
       pathtoPublish: '$(outputDirectory)'
+
+- job: 'Chat API'
+  pool:
+    vmImage: 'vs2017-win2016'
+
+  variables:
+    buildConfiguration: 'Release'
+    outputDirectory: '$(build.binariesDirectory)/$(buildConfiguration)'
+
+  steps:
+  - task: DotNetCoreCLI@2
+    inputs:
+      command: 'build'
+      projects: '**/Web.Api.csproj;**/Chat.Silo.csproj'
+      configuration: '$(BuildConfiguration)'
 
 # pool:
 #  vmImage: 'vs2017-win2016'
