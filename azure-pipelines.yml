@@ -31,7 +31,7 @@ jobs:
     inputs:
       pathtoPublish: '$(outputDirectory)'
 
-- job: 'Chat API'
+- job: Chat_API
   pool:
     vmImage: 'vs2017-win2016'
 
