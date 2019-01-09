@@ -16,21 +16,21 @@ namespace LibraProgramming.ChatRoom.Services.Chat.Api.Core
     public class ChatRoomWebSocketHandler : WebSocketHandler
     {
         private readonly IClusterClient client;
-        private readonly ChatRoomOptions options;
+        private readonly WebSocketHandlerResolverOptions options;
         private readonly ILogger<ChatRoomWebSocketHandler> logger;
         private WebSocket socket;
         private IAsyncStream<ChatMessage> stream;
         private StreamSubscriptionHandle<ChatMessage> subscription;
         private long roomId;
 
-        public ChatRoomWebSocketHandler(IClusterClient client, IOptions<ChatRoomOptions> options, ILogger<ChatRoomWebSocketHandler> logger)
+        public ChatRoomWebSocketHandler(IClusterClient client, IOptions<WebSocketHandlerResolverOptions> options, ILogger<ChatRoomWebSocketHandler> logger)
         {
             this.client = client;
             this.options = options.Value;
             this.logger = logger;
         }
 
-        public override bool CanAccept(HttpRequest request)
+        /*public override bool CanAccept(HttpRequest request)
         {
             if (false == request.Path.StartsWithSegments(options.RequestPath))
             {
@@ -48,7 +48,7 @@ namespace LibraProgramming.ChatRoom.Services.Chat.Api.Core
             roomId = Convert.ToInt64(tail);
 
             return true;
-        }
+        }*/
 
         public override async Task OnConnectAsync(WebSocket s)
         {
@@ -62,8 +62,10 @@ namespace LibraProgramming.ChatRoom.Services.Chat.Api.Core
             subscription = await stream.SubscribeAsync(OnMessage);
         }
 
-        public override Task OnTextAsync(WebSocket s, string text)
+        public override Task OnMessageAsync(WebSocket s, WebSocketMessageType messageType,ArraySegment<byte> message)
         {
+            var text = Encoding.UTF8.GetString(message.Array);
+
             return stream.OnNextAsync(new ChatMessage
             {
                 Content = text,

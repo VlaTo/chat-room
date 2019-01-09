@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace LibraProgramming.ChatRoom.Services.Chat.Api.Core
 {
-    public class ChatRoomOptions
+    public class WebSocketHandlerResolverOptions
     {
         private PathString requestPath;
 
@@ -21,7 +21,7 @@ namespace LibraProgramming.ChatRoom.Services.Chat.Api.Core
             }
         }
 
-        public ChatRoomOptions()
+        public WebSocketHandlerResolverOptions()
         {
             requestPath = new PathString("/chat");
         }

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Net.WebSockets;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -11,13 +10,12 @@ namespace LibraProgramming.ChatRoom.Services.Chat.Api.Core
     public class WebSocketsMiddleware
     {
         private readonly RequestDelegate next;
-        private readonly WebSocketHandler socketHandler;
+        private readonly WebSocketHandlerResolver resolver;
 
-        public WebSocketsMiddleware(RequestDelegate next, WebSocketHandler socketHandler)
+        public WebSocketsMiddleware(RequestDelegate next, WebSocketHandlerResolver resolver)
         {
             this.next = next;
-            this.socketHandler = socketHandler;
-            ;
+            this.resolver = resolver;
         }
 
         public Task Invoke(HttpContext context)
@@ -27,41 +25,37 @@ namespace LibraProgramming.ChatRoom.Services.Chat.Api.Core
                 return next.Invoke(context);
             }
 
-            if (false == socketHandler.CanAccept(context.Request))
-            {
-                return next.Invoke(context);
-            }
+            var handler = resolver.ResolveHandler(context.Request.Path);
 
-            return HandleWebSocket(context);
+            return null != handler ? next.Invoke(context) : HandleWebSocket(context, handler);
         }
 
-        private async Task HandleWebSocket(HttpContext context)
+        private static async Task HandleWebSocket(HttpContext context, WebSocketHandler handler)
         {
             var socket = await context.WebSockets.AcceptWebSocketAsync();
 
-            await socketHandler.OnConnectAsync(socket);
+            await handler.OnConnectAsync(socket);
 
             await ReceiveAsync(socket, context.RequestAborted, async (message, result) =>
             {
                 switch (result.MessageType)
                 {
                     case WebSocketMessageType.Binary:
-                    {
-                        await socketHandler.OnBinaryAsync(socket, message);
-                        break;
-                    }
-
                     case WebSocketMessageType.Text:
                     {
-                        var text = Encoding.UTF8.GetString(message.Array);
-                        await socketHandler.OnTextAsync(socket, text);
+                        await handler.OnMessageAsync(socket, result.MessageType, message);
                         break;
                     }
                     
                     case WebSocketMessageType.Close:
                     {
-                        await socketHandler.OnDisconnectAsync(socket);
+                        await handler.OnDisconnectAsync(socket);
                         break;
+                    }
+
+                    default:
+                    {
+                        throw new InvalidDataException();
                     }
                 }
             });

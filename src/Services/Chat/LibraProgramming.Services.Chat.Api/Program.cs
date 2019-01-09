@@ -129,7 +129,7 @@ namespace LibraProgramming.ChatRoom.Services.Chat.Api
                         });
 
                     services
-                        .AddChatRoomHandler(options =>
+                        .AddWebSocketHandlers(options =>
                         {
                             options.RequestPath = new PathString("/api/chat");
                         });

@@ -8,8 +8,8 @@ namespace LibraProgramming.ChatRoom.Services.Chat.Api.Extensions
 {
     public static class ServiceCollectionExtensions
     {
-        public static IServiceCollection AddChatRoomHandler(this IServiceCollection services,
-            Action<ChatRoomOptions> configurator)
+        public static IServiceCollection AddWebSocketHandlers(this IServiceCollection services,
+            Action<WebSocketHandlerResolverOptions> configurator)
         {
             if (null == services)
             {
@@ -23,10 +23,10 @@ namespace LibraProgramming.ChatRoom.Services.Chat.Api.Extensions
 
             services
                 .TryAddEnumerable(
-                    ServiceDescriptor.Transient<IConfigureOptions<ChatRoomOptions>, ChatRoomOptionsSetup>()
+                    ServiceDescriptor.Transient<IConfigureOptions<WebSocketHandlerResolverOptions>, WebSocketHandlerResolverOptionsSetup>()
                 );
 
-            services.TryAddTransient<WebSocketHandler, ChatRoomWebSocketHandler>();
+            services.TryAddTransient<WebSocketHandlerResolver>();
             services.Configure(configurator);
 
             return services;
