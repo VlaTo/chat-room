@@ -1,43 +1,45 @@
+trigger:
+  - master
+
 pool:
-    vmImage: 'VS2017-Win2016'
+  vmImage: 'VS2017-Win2016'
 
 variables:
-    buildConfiguration: 'Release'
-    outputDirectory: '$(build.binariesDirectory)/$(buildConfiguration)'
+  buildConfiguration: 'Release'
+  outputDirectory: '$(build.binariesDirectory)/$(buildConfiguration)'
 
-steps:
-    # Android
-    - task: MSBuild@1
-        inputs:
-            solution: '**/*.sln'
-            configuration: '$(buildConfiguration)'
-            msbuildArguments: '/t:restore'
+# Android
+- task: MSBuild@1
+  inputs:
+    solution: '**/*.sln'
+    configuration: '$(buildConfiguration)'
+    msbuildArguments: '/t:restore'
 
-    - task: XamarinAndroid@1
-        inputs:
-            projectFile: '**/*droid*.csproj'
-            outputDirectory: '$(outputDirectory)'
-            configuration: '$(buildConfiguration)'
+- task: XamarinAndroid@1
+  inputs:
+    projectFile: '**/*droid*.csproj'
+    outputDirectory: '$(outputDirectory)'
+    configuration: '$(buildConfiguration)'
 
-    - task: AndroidSigning@3
-        inputs:
-            apksign: false
-            zipalign: false
-            apkFiles: '$(outputDirectory)/*.apk'
+- task: AndroidSigning@3
+  inputs:
+    apksign: false
+    zipalign: false
+    apkFiles: '$(outputDirectory)/*.apk'
 
-    - task: PublishBuildArtifacts@1
-        inputs:
-            pathtoPublish: '$(outputDirectory)'
+- task: PublishBuildArtifacts@1
+  inputs:
+    pathtoPublish: '$(outputDirectory)'
 
-    # API
-    - task: MSBuild@1
-        inputs:
-            solution: '**/*.sln'
-            configuration: '$(buildConfiguration)'
-            msbuildArguments: '/t:restore'
+# API
+- task: MSBuild@1
+  inputs:
+    solution: '**/*.sln'
+    configuration: '$(buildConfiguration)'
+    msbuildArguments: '/t:restore'
 
-    - task: DotNetCoreCLI@2
-        inputs:
-            command: 'build'
-            projects: 'src/**/Web.Api.csproj'
-            configuration: '$(BuildConfiguration)'
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'build'
+    projects: 'src/**/Web.Api.csproj'
+    configuration: '$(BuildConfiguration)'
