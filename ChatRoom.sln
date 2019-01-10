@@ -25,7 +25,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Chat.Contracts", "src\Servi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Chat.Grains", "src\Services\Chat\LibraProgramming.Services.Chat.Grains\Chat.Grains.csproj", "{A26B9456-E10C-40AC-92DF-4ADC6FDB6DA0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chat.Silo", "src\Services\Chat\LibraProgramming.Services.Chat.Silo\Chat.Silo.csproj", "{DC042C3F-080D-49AA-8AC6-4F397CE79EA4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Chat.Silo", "src\Services\Chat\LibraProgramming.Services.Chat.Silo\Chat.Silo.csproj", "{DC042C3F-080D-49AA-8AC6-4F397CE79EA4}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{7DDD03A6-9BC6-4E0A-9F80-F265E5C77DAD}"
+	ProjectSection(SolutionItems) = preProject
+		azure-pipelines.yml = azure-pipelines.yml
+		README.md = README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

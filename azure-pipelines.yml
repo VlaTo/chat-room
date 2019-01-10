@@ -1,65 +1,43 @@
-jobs:
-
-- job: Android
-  pool:
+pool:
     vmImage: 'VS2017-Win2016'
 
-  variables:
+variables:
     buildConfiguration: 'Release'
     outputDirectory: '$(build.binariesDirectory)/$(buildConfiguration)'
 
-  steps:
-  - task: MSBuild@1
-    inputs:
-      solution: '**/*.sln'
-      configuration: '$(buildConfiguration)'
-      msbuildArguments: '/t:restore'
+steps:
+    # Android
+    - task: MSBuild@1
+        inputs:
+            solution: '**/*.sln'
+            configuration: '$(buildConfiguration)'
+            msbuildArguments: '/t:restore'
 
-  - task: XamarinAndroid@1
-    inputs:
-      projectFile: '**/*droid*.csproj'
-      outputDirectory: '$(outputDirectory)'
-      configuration: '$(buildConfiguration)'
+    - task: XamarinAndroid@1
+        inputs:
+            projectFile: '**/*droid*.csproj'
+            outputDirectory: '$(outputDirectory)'
+            configuration: '$(buildConfiguration)'
 
-  - task: AndroidSigning@3
-    inputs:
-      apksign: false
-      zipalign: false
-      apkFiles: '$(outputDirectory)/*.apk'
+    - task: AndroidSigning@3
+        inputs:
+            apksign: false
+            zipalign: false
+            apkFiles: '$(outputDirectory)/*.apk'
 
-  - task: PublishBuildArtifacts@1
-    inputs:
-      pathtoPublish: '$(outputDirectory)'
+    - task: PublishBuildArtifacts@1
+        inputs:
+            pathtoPublish: '$(outputDirectory)'
 
-- job: Chat_API
-  pool:
-    vmImage: 'vs2017-win2016'
+    # API
+    - task: MSBuild@1
+        inputs:
+            solution: '**/*.sln'
+            configuration: '$(buildConfiguration)'
+            msbuildArguments: '/t:restore'
 
-  variables:
-    buildConfiguration: 'Release'
-    outputDirectory: '$(build.binariesDirectory)/$(buildConfiguration)'
-
-  steps:
-  - task: MSBuild@1
-    inputs:
-      solution: '**/*.sln'
-      configuration: '$(buildConfiguration)'
-      msbuildArguments: '/t:restore'
-
-  - task: DotNetCoreCLI@2
-    inputs:
-      command: 'build'
-      projects: 'src/**/Web.Api.csproj'
-      configuration: '$(BuildConfiguration)'
-
-# pool:
-#  vmImage: 'vs2017-win2016'
-
-# variables:
-#  buildConfiguration: 'Release'
-
-# steps:
-# - script: set
-# - script: $("tool.vstools")VsMSBuildCmd.bat /t:restore
-# - script: dotnet build --configuration $(buildConfiguration)
-#  displayName: 'dotnet build $(buildConfiguration)'
+    - task: DotNetCoreCLI@2
+        inputs:
+            command: 'build'
+            projects: 'src/**/Web.Api.csproj'
+            configuration: '$(BuildConfiguration)'
