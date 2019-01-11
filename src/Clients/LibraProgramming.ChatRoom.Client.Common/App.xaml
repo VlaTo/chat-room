@@ -6,13 +6,17 @@
     x:Class="LibraProgramming.ChatRoom.Client.Common.App">
     <Application.Resources>
         <ResourceDictionary>
-            <!--Global Styles-->
+            <vm:ViewModelLocator x:Key="ViewModelLocator" />
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Styles/Global.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <!--
             <Color x:Key="NavigationPrimary">#2196F3</Color>
             <Style TargetType="NavigationPage">
                 <Setter Property="BarBackgroundColor" Value="{StaticResource NavigationPrimary}" />
                 <Setter Property="BarTextColor" Value="White" />
             </Style>
-            <vm:ViewModelLocator x:Key="ViewModelLocator" />
+            -->
         </ResourceDictionary>
     </Application.Resources>
 </Application>

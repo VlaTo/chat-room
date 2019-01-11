@@ -129,6 +129,7 @@ namespace LibraProgramming.ChatRoom.Services.Chat.Api
                         });
 
                     services
+                        .AddSingleton<IChatRoomRegistry, ChatRoomRegistry>()
                         .AddWebSocketHandlers(options =>
                         {
                             options.Register<ChatRoomWebSocketHandler>("api/chat/{room:long}");

@@ -25,8 +25,7 @@ namespace LibraProgramming.ChatRoom.Client.Common.Services
         {
             try
             {
-                var request = WebRequest.Create("http://localhost:5000/api/rooms/");
-                //var request = WebRequest.Create("http://192.168.1.127:5000/api/rooms/");
+                var request = WebRequest.Create("http://192.168.5.78:5000/api/rooms/");
 
                 request.Method = WebRequestMethods.Http.Get;
 

@@ -1,0 +1,40 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Shell
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:pages="clr-namespace:LibraProgramming.ChatRoom.Client.Common.Views"
+    xmlns:e="clr-namespace:LibraProgramming.ChatRoom.Client.Common.Extensions"
+    x:Class="LibraProgramming.ChatRoom.Client.Common.Views.AppShell"
+    RouteScheme="app"
+    RouteHost="chat-rooms.org"
+    Route="chat"
+    FlyoutHeaderBehavior="CollapseOnScroll"
+    Title="Chat Rooms">
+    <Shell.FlyoutHeader>
+        <Grid
+            HeightRequest="300">
+            <Image
+                Source="{e:ImageResource ChatApp.Images.shells_01.jpg}"
+                Aspect="AspectFill"
+                HeightRequest="300"
+                HorizontalOptions="FillAndExpand"
+            />
+            <Label
+                FontSize="Default"
+                Text="ChatApp"
+                HorizontalOptions="Center"
+                VerticalOptions="Center"
+                HorizontalTextAlignment="Center"
+                VerticalTextAlignment="Center"
+            />
+        </Grid>
+    </Shell.FlyoutHeader>
+    <ShellItem
+        Title="Home">
+        <ShellSection>
+            <ShellContent>
+                <pages:MainPage />
+            </ShellContent>
+        </ShellSection>
+    </ShellItem>
+</Shell>

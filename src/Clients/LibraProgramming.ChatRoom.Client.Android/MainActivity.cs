@@ -2,6 +2,7 @@
 using Android.Content.PM;
 using Android.OS;
 using LibraProgramming.ChatRoom.Client.Common;
+using Xamarin.Forms.Platform.Android;
 
 namespace LibraProgramming.ChatRoom.Client.Android
 {
@@ -12,7 +13,7 @@ namespace LibraProgramming.ChatRoom.Client.Android
         MainLauncher = true,
         ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation
     )]
-    public class MainActivity : global::Xamarin.Forms.Platform.Android.FormsAppCompatActivity
+    public class MainActivity : FormsAppCompatActivity
     {
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -20,7 +21,10 @@ namespace LibraProgramming.ChatRoom.Client.Android
             ToolbarResource = Resource.Layout.Toolbar;
 
             base.OnCreate(savedInstanceState);
-            global::Xamarin.Forms.Forms.Init(this, savedInstanceState);
+
+            Xamarin.Forms.Forms.SetFlags("Shell_Experimental");
+            Xamarin.Forms.Forms.Init(this, savedInstanceState);
+
             LoadApplication(new App());
         }
     }

@@ -3,6 +3,7 @@ using Microsoft.Extensions.Options;
 using Orleans;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
@@ -21,7 +22,6 @@ namespace LibraProgramming.ChatRoom.Services.Chat.Api.Core
         private readonly IChatRoomRegistry registry;
         private readonly ILogger<ChatRoomWebSocketHandler> logger;
         private readonly Encoding encoding;
-        private WebSocket socket;
         private IAsyncStream<ChatMessage> stream;
         private StreamSubscriptionHandle<ChatMessage> subscription;
         private long roomId;
@@ -31,6 +31,7 @@ namespace LibraProgramming.ChatRoom.Services.Chat.Api.Core
             this.client = client;
             this.registry = registry;
             this.logger = logger;
+
             encoding = Encoding.UTF8;
         }
 
@@ -41,10 +42,22 @@ namespace LibraProgramming.ChatRoom.Services.Chat.Api.Core
             var chat = client.GetGrain<IChatRoom>(room);
             var streamId = await chat.JoinAsync();
 
-            socket = webSocket;
             roomId = room;
             stream = streamProvider.GetStream<ChatMessage>(streamId, Constants.Streams.Namespaces.Chats);
-            subscription = await stream.SubscribeAsync(OnMessage);
+
+            var handlers = await stream.GetAllSubscriptionHandles();
+
+            if (null == handlers || 0 == handlers.Count)
+            {
+                subscription = await stream.SubscribeAsync(OnStreamMessage);
+            }
+            else
+            {
+                foreach (var handler in handlers)
+                {
+                    subscription = await handler.ResumeAsync(OnStreamMessage);
+                }
+            }
 
             registry[room].Add(webSocket);
         }
@@ -67,15 +80,15 @@ namespace LibraProgramming.ChatRoom.Services.Chat.Api.Core
             });
         }
 
-        public override async Task OnDisconnectAsync(WebSocket webSocket)
+        public override Task OnDisconnectAsync(WebSocket webSocket)
         {
-            registry[roomId].Remove(socket);
-            await subscription.UnsubscribeAsync();
+            registry[roomId].Remove(webSocket);
+            return subscription.UnsubscribeAsync();
         }
 
-        private Task OnMessage(ChatMessage message, StreamSequenceToken sst)
+        private Task OnStreamMessage(ChatMessage message, StreamSequenceToken sst)
         {
-            logger.LogInformation($"Message from stream: \"{message.Content}\"");
+            logger.LogDebug($"Message from stream: \"{message.Content}\"");
 
             var bytes = encoding.GetBytes(message.Content);
             var data = new ArraySegment<byte>(bytes);
