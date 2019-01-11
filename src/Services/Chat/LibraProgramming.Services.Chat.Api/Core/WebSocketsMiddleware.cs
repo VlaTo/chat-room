@@ -36,29 +36,37 @@ namespace LibraProgramming.ChatRoom.Services.Chat.Api.Core
 
             await handler.OnConnectAsync(socket);
 
-            await ReceiveAsync(socket, context.RequestAborted, async (message, result) =>
+            try
             {
-                switch (result.MessageType)
+                await ReceiveAsync(socket, context.RequestAborted, async (message, result) =>
                 {
-                    case WebSocketMessageType.Binary:
-                    case WebSocketMessageType.Text:
+                    switch (result.MessageType)
                     {
-                        await handler.OnMessageAsync(socket, result.MessageType, message);
-                        break;
-                    }
-                    
-                    case WebSocketMessageType.Close:
-                    {
-                        await handler.OnDisconnectAsync(socket);
-                        break;
-                    }
+                        case WebSocketMessageType.Binary:
+                        case WebSocketMessageType.Text:
+                        {
+                            await handler.OnMessageAsync(socket, result.MessageType, message);
+                            break;
+                        }
 
-                    default:
-                    {
-                        throw new InvalidDataException();
+                        case WebSocketMessageType.Close:
+                        {
+                            await handler.OnDisconnectAsync(socket);
+                            break;
+                        }
+
+                        default:
+                        {
+                            throw new InvalidDataException();
+                        }
                     }
-                }
-            });
+                });
+            }
+            catch (Exception e)
+            {
+
+                throw;
+            }
         }
 
         private static async Task ReceiveAsync(WebSocket socket, CancellationToken ct, Func<ArraySegment<byte>, WebSocketReceiveResult, Task> handler)
