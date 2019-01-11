@@ -1,15 +1,12 @@
 ﻿using LibraProgramming.ChatRoom.Client.Common.Services;
 using LibraProgramming.ChatRoom.Client.Common.ViewModels;
-using LibraProgramming.ChatRoom.Client.Common.Views;
 using Ninject;
-using Xamarin.Forms.Xaml;
 
-[assembly: XamlCompilation(XamlCompilationOptions.Compile)]
 namespace LibraProgramming.ChatRoom.Client.Common
 {
     public partial class App
     {
-        public static StandardKernel Kernel
+        public static IReadOnlyKernel Kernel
         {
             get;
         }
@@ -18,22 +15,24 @@ namespace LibraProgramming.ChatRoom.Client.Common
         {
             InitializeComponent();
 
-            Kernel
-                .Bind<IChatRoomService>()
-                .To<ChatRoomService>()
-                .InSingletonScope();
-
-            Kernel
-                .Bind<RoomsViewModel>()
-                .ToSelf()
-                .InTransientScope();
-
             MainPage = new AppShell();
         }
 
         static App()
         {
-            Kernel = new StandardKernel();
+            var configuration = new KernelConfiguration();
+
+            configuration
+                .Bind<IChatRoomService>()
+                .To<ChatRoomService>()
+                .InSingletonScope();
+
+            configuration
+                .Bind<RoomsViewModel>()
+                .ToSelf()
+                .InTransientScope();
+
+            Kernel = configuration.BuildReadonlyKernel();
         }
 
         protected override void OnStart()

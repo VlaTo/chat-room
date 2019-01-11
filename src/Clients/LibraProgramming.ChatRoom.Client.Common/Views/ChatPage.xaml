@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<views:SetupAwareContentPage
+<v:SetupAwareContentPage
     xmlns="http://xamarin.com/schemas/2014/forms"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:views="clr-namespace:LibraProgramming.ChatRoom.Client.Common.Views"
+    xmlns:v="clr-namespace:LibraProgramming.ChatRoom.Client.Common.Views"
     x:Class="LibraProgramming.ChatRoom.Client.Common.Views.ChatPage"
     Title="{Binding Path=Title}">
     <StackLayout
@@ -78,4 +78,4 @@
             </Grid>
         </Grid>
     </StackLayout>
-</views:SetupAwareContentPage>
+</v:SetupAwareContentPage>

@@ -10,7 +10,7 @@ namespace LibraProgramming.ChatRoom.Client.UWP
     /// <summary>
     /// Provides application-specific behavior to supplement the default Application class.
     /// </summary>
-    sealed partial class App : Application
+    sealed partial class App
     {
         /// <summary>
         /// Initializes the singleton application object.  This is the first line of authored code
@@ -40,6 +40,7 @@ namespace LibraProgramming.ChatRoom.Client.UWP
 
                 rootFrame.NavigationFailed += OnNavigationFailed;
 
+                Xamarin.Forms.Forms.SetFlags("Shell_Experimental", "Visual_Experimental", "CollectionView_Experimental", "FastRenderers_Experimental");
                 Xamarin.Forms.Forms.Init(e);
 
                 if (e.PreviousExecutionState == ApplicationExecutionState.Terminated)
@@ -58,7 +59,6 @@ namespace LibraProgramming.ChatRoom.Client.UWP
                 // parameter
                 rootFrame.Navigate(typeof(MainPage), e.Arguments);
             }
-
             // Ensure the current window is active
             Window.Current.Activate();
         }

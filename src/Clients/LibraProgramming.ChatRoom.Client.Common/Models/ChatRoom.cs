@@ -1,6 +1,4 @@
-﻿using LibraProgramming.ChatRoom.Client.Common.Core;
-
-namespace LibraProgramming.ChatRoom.Client.Common.Models
+﻿namespace LibraProgramming.ChatRoom.Client.Common.Models
 {
     public class ChatRoom : IEntity<long>
     {

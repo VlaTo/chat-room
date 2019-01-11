@@ -1,16 +1,14 @@
-﻿using System;
+﻿using LibraProgramming.Services.Chat.Domain;
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Net;
-using System.Net.Mime;
 using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using LibraProgramming.ChatRoom.Client.Common.ViewModels;
-using LibraProgramming.Services.Chat.Domain;
-using Newtonsoft.Json;
 
 namespace LibraProgramming.ChatRoom.Client.Common.Services
 {
@@ -25,7 +23,7 @@ namespace LibraProgramming.ChatRoom.Client.Common.Services
         {
             try
             {
-                var request = WebRequest.Create("http://192.168.5.78:5000/api/rooms/");
+                var request = WebRequest.Create("http://192.168.1.127:5000/api/rooms/");
 
                 request.Method = WebRequestMethods.Http.Get;
 
@@ -83,8 +81,7 @@ namespace LibraProgramming.ChatRoom.Client.Common.Services
         {
             try
             {
-                var request = (HttpWebRequest) WebRequest.Create("http://localhost:5000/api/room/");
-                //var request = (HttpWebRequest) WebRequest.Create("http://192.168.1.127:5000/api/room/");
+                var request = (HttpWebRequest) WebRequest.Create("http://192.168.1.127:5000/api/room/");
 
                 request.Method = WebRequestMethods.Http.Post;
                 request.ContentType = "application/json";
@@ -141,8 +138,7 @@ namespace LibraProgramming.ChatRoom.Client.Common.Services
         {
             var socket = new ClientWebSocket();
 
-            await socket.ConnectAsync(new Uri($"ws://localhost:5000/api/chat/{roomId}"), ct);
-            //await socket.ConnectAsync(new Uri($"ws://192.168.1.127:5000/api/chat/{roomId}"), ct);
+            await socket.ConnectAsync(new Uri($"ws://192.168.1.127:5000/api/chat/{roomId}"), ct);
 
             var channel = new ChatChannel(this, socket);
 

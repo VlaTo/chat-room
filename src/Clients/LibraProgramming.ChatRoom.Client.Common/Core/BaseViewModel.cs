@@ -9,8 +9,6 @@ namespace LibraProgramming.ChatRoom.Client.Common.Core
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        //public IDataStore<Item> DataStore => DependencyService.Get<IDataStore<Item>>() ?? new MockDataStore();
-
         protected bool SetProperty<T>(
             ref T field,
             T value,

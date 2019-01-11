@@ -12,8 +12,14 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Ninject" Version="3.3.4" />
-    <PackageReference Include="Xamarin.Forms" Version="4.0.0.62955-pre2" />  
+    <Compile Remove="Themes\**" />
+    <EmbeddedResource Remove="Themes\**" />
+    <None Remove="Themes\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Ninject" Version="4.0.0-beta-0134" />
+    <PackageReference Include="Xamarin.Forms" Version="4.0.1.43780-nightly" />  
     <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
   </ItemGroup>
 
@@ -56,13 +62,6 @@
 
   <ItemGroup>
     <Folder Include="Styles\" />
-    <Folder Include="Themes\" />
     <Folder Include="Extensions\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Update="Views\AppShell.xaml">
-      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
-    </EmbeddedResource>
   </ItemGroup>
 </Project>

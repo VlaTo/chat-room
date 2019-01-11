@@ -2,7 +2,7 @@
 <TabbedPage
     xmlns="http://xamarin.com/schemas/2014/forms"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:views="clr-namespace:LibraProgramming.ChatRoom.Client.Common.Views"
+    xmlns:v="clr-namespace:LibraProgramming.ChatRoom.Client.Common.Views"
     x:Class="LibraProgramming.ChatRoom.Client.Common.Views.MainPage">
     <TabbedPage.Children>
         <NavigationPage
@@ -14,7 +14,7 @@
                 </OnPlatform>
             </NavigationPage.Icon>
             <x:Arguments>
-                <views:RoomsPage />
+                <v:RoomsPage />
             </x:Arguments>
         </NavigationPage>
         <NavigationPage
@@ -26,7 +26,7 @@
                 </OnPlatform>
             </NavigationPage.Icon>
             <x:Arguments>
-                <views:AboutPage />
+                <v:AboutPage />
             </x:Arguments>
         </NavigationPage>
     </TabbedPage.Children>
