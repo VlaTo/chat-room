@@ -4,6 +4,7 @@ using System.Net.WebSockets;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Routing;
 
 namespace LibraProgramming.ChatRoom.Services.Chat.Api.Core
 {
@@ -25,16 +26,17 @@ namespace LibraProgramming.ChatRoom.Services.Chat.Api.Core
                 return next.Invoke(context);
             }
 
-            var handler = resolver.ResolveHandler(context.Request.Path);
+            var values = new RouteValueDictionary();
+            var handler = resolver.ResolveHandler(context.Request.Path, values);
 
-            return null != handler ? next.Invoke(context) : HandleWebSocket(context, handler);
+            return null == handler ? next.Invoke(context) : HandleWebSocket(context, handler, values);
         }
 
-        private static async Task HandleWebSocket(HttpContext context, WebSocketHandler handler)
+        private static async Task HandleWebSocket(HttpContext context, WebSocketHandler handler, RouteValueDictionary values)
         {
             var socket = await context.WebSockets.AcceptWebSocketAsync();
 
-            await handler.OnConnectAsync(socket);
+            await handler.OnConnectAsync(socket, values);
 
             await ReceiveAsync(socket, context.RequestAborted, async (message, result) =>
             {

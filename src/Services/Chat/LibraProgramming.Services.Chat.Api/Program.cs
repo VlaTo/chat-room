@@ -131,7 +131,7 @@ namespace LibraProgramming.ChatRoom.Services.Chat.Api
                     services
                         .AddWebSocketHandlers(options =>
                         {
-                            options.RequestPath = new PathString("/api/chat");
+                            options.Register<ChatRoomWebSocketHandler>("api/chat/{room:long}");
                         });
 
                     services
@@ -143,11 +143,12 @@ namespace LibraProgramming.ChatRoom.Services.Chat.Api
                 })
                 .Configure(app =>
                 {
-                    var environment = app.ApplicationServices.GetRequiredService<Microsoft.AspNetCore.Hosting.IHostingEnvironment>();
+                    var provider = app.ApplicationServices;
+                    var environment = provider.GetRequiredService<Microsoft.AspNetCore.Hosting.IHostingEnvironment>();
 
                     if (environment.IsDevelopment())
                     {
-                        var logger = app.ApplicationServices.GetRequiredService<ILogger<Program>>();
+                        var logger = provider.GetRequiredService<ILogger<Program>>();
 
                         logger.LogDebug("Application run in development mode");
 
