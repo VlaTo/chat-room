@@ -5,8 +5,11 @@
     xmlns:views="clr-namespace:LibraProgramming.ChatRoom.Client.Common.Views"
     x:Class="LibraProgramming.ChatRoom.Client.Common.Views.ChatPage"
     Title="{Binding Path=Title}">
-    <StackLayout Spacing="20" Padding="15">
-        <Grid>
+    <StackLayout
+        BackgroundColor="LightGray"
+        Orientation="Vertical">
+        <Grid
+            Padding="4">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
                 <RowDefinition Height="Auto" />
@@ -15,25 +18,49 @@
                 Grid.Row="0"
                 ItemsSource="{Binding Path=Messages}"
                 CachingStrategy="RecycleElement"
-                VerticalOptions="StartAndExpand"
-                HorizontalOptions="Fill">
+                VerticalOptions="FillAndExpand"
+                HorizontalOptions="Fill"
+                SeparatorVisibility="Default">
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <ViewCell>
                             <Frame
-                                BorderColor="Black"
-                                BackgroundColor="AntiqueWhite">
-                                <Label
-                                    Margin="4"
-                                    Text="{Binding Path=Content, Mode=OneTime}"
-                                />
+                                BorderColor="DarkGray"
+                                BackgroundColor="White"
+                                Margin="24,2,4,2"
+                                Padding="8,4">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+                                    <Label
+                                        Grid.Row="0"
+                                        FontSize="Micro"
+                                        Text="Autor name"
+                                    />
+                                    <Label
+                                        Grid.Row="1"
+                                        FontSize="Default"
+                                        Text="{Binding Path=Content, Mode=OneTime}"
+                                    />
+                                </Grid>
                             </Frame>
                         </ViewCell>
                     </DataTemplate>
                 </ListView.ItemTemplate>
+                <ListView.HeaderTemplate>
+                    <DataTemplate>
+                        <Label
+                            FontSize="Default"
+                            Text="{Binding Path=Title, Mode=OneTime}"
+                        />
+                    </DataTemplate>
+                </ListView.HeaderTemplate>
             </ListView>
             <Grid
-                Grid.Row="1">
+                Grid.Row="1"
+                Margin="4">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />

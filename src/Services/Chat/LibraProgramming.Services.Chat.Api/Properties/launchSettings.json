@@ -17,11 +17,10 @@
     },
     "ChatRoom.MobileAppService": {
       "commandName": "Project",
-      "launchBrowser": true,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
-      "applicationUrl": "http://localhost:5000/"
+      "applicationUrl": "http://192.168.5.78:5000"
     }
   }
 }
