@@ -7,7 +7,8 @@
     RouteScheme="app"
     Route="chat"
     Title="Chat Rooms"
-    x:Class="LibraProgramming.ChatRoom.Client.Common.AppShell">
+    x:Class="LibraProgramming.ChatRoom.Client.Common.AppShell"
+    Navigating="OnShellNavigating">
 
     <!--
         XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX

@@ -5,7 +5,6 @@
         public MainPage()
         {
             InitializeComponent();
-
             LoadApplication(new Common.App());
         }
     }
