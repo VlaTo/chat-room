@@ -41,10 +41,10 @@ namespace LibraProgramming.ChatRoom.Client.UWP
                 rootFrame.NavigationFailed += OnNavigationFailed;
 
                 Xamarin.Forms.Forms.SetFlags(
-                    "Shell_Experimental"
-                    //"Visual_Experimental",
-                    //"CollectionView_Experimental",
-                    //"FastRenderers_Experimental"
+                    "Shell_Experimental",
+                    "Visual_Experimental",
+                    "CollectionView_Experimental",
+                    "FastRenderers_Experimental"
                 );
                 Xamarin.Forms.Forms.Init(e);
 

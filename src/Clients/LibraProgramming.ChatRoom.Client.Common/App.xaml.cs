@@ -6,7 +6,7 @@ namespace LibraProgramming.ChatRoom.Client.Common
 {
     public partial class App
     {
-        public static IReadOnlyKernel Kernel
+        public static IKernel Kernel
         {
             get;
         }
@@ -20,19 +20,19 @@ namespace LibraProgramming.ChatRoom.Client.Common
 
         static App()
         {
-            var configuration = new KernelConfiguration();
+            var kernel = new StandardKernel();
 
-            configuration
+            kernel
                 .Bind<IChatRoomService>()
                 .To<ChatRoomService>()
                 .InSingletonScope();
 
-            configuration
+            kernel
                 .Bind<RoomsViewModel>()
                 .ToSelf()
                 .InTransientScope();
 
-            Kernel = configuration.BuildReadonlyKernel();
+            Kernel = kernel;
         }
 
         protected override void OnStart()
