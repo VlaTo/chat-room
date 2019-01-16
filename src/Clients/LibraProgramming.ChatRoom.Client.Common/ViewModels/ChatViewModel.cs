@@ -79,7 +79,9 @@ namespace LibraProgramming.ChatRoom.Client.Common.ViewModels
             {
                 Messages.Add(new MessageViewModel
                 {
-                    Content = e.Text
+                    Author = e.Message.Author,
+                    Content = e.Message.Content,
+                    Created = e.Message.Created
                 });
             });
         }

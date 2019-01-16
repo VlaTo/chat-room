@@ -1,18 +1,19 @@
 ﻿using System;
 using System.Threading.Tasks;
+using LibraProgramming.Services.Chat.Domain.Messages;
 
 namespace LibraProgramming.ChatRoom.Client.Common.Services
 {
     public sealed class ChatMessageEventArgs : EventArgs
     {
-        public string Text
+        public OutgoingChatMessage Message
         {
             get;
         }
 
-        public ChatMessageEventArgs(string text)
+        public ChatMessageEventArgs(OutgoingChatMessage message)
         {
-            Text = text;
+            Message = message;
         }
     }
 

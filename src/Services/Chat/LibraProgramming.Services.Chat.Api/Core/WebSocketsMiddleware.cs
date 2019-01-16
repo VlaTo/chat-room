@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Logging;
 
 namespace LibraProgramming.ChatRoom.Services.Chat.Api.Core
 {
@@ -12,11 +13,13 @@ namespace LibraProgramming.ChatRoom.Services.Chat.Api.Core
     {
         private readonly RequestDelegate next;
         private readonly WebSocketHandlerResolver resolver;
+        private readonly ILogger logger;
 
-        public WebSocketsMiddleware(RequestDelegate next, WebSocketHandlerResolver resolver)
+        public WebSocketsMiddleware(RequestDelegate next, WebSocketHandlerResolver resolver, ILogger logger)
         {
             this.next = next;
             this.resolver = resolver;
+            this.logger = logger;
         }
 
         public Task Invoke(HttpContext context)
@@ -32,7 +35,7 @@ namespace LibraProgramming.ChatRoom.Services.Chat.Api.Core
             return null == handler ? next.Invoke(context) : HandleWebSocket(context, handler, values);
         }
 
-        private static async Task HandleWebSocket(HttpContext context, WebSocketHandler handler, RouteValueDictionary values)
+        private async Task HandleWebSocket(HttpContext context, WebSocketHandler handler, RouteValueDictionary values)
         {
             var socket = await context.WebSockets.AcceptWebSocketAsync();
 
@@ -64,9 +67,9 @@ namespace LibraProgramming.ChatRoom.Services.Chat.Api.Core
                     }
                 });
             }
-            catch (Exception e)
+            catch (Exception exception)
             {
-
+                logger.LogError(exception, "WebSocketsMiddleware.HandleWebSocket");
                 throw;
             }
         }

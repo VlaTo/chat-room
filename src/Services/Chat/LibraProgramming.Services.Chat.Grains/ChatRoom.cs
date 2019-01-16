@@ -77,6 +77,10 @@ namespace LibraProgramming.Services.Chat.Grains
             return WriteStateAsync();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public async Task<Guid> JoinAsync()
         {
             if (Guid.Empty == State.Description.StreamId)

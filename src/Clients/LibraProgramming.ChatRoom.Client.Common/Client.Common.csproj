@@ -25,7 +25,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Services\Chat\LibraProgramming.Services.Chat.Domain\Web.Domain.csproj" />
+    <ProjectReference Include="..\..\Common\LibraProgramming.ChatRoom.Common.Hessian\Common.Hessian.csproj" />
+    <ProjectReference Include="..\..\Services\Chat\LibraProgramming.Services.Chat.Domain\Chat.Domain.csproj" />
   </ItemGroup>
 
   <ItemGroup>

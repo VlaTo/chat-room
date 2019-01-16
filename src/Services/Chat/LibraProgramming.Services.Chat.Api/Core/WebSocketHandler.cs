@@ -12,7 +12,7 @@ namespace LibraProgramming.ChatRoom.Services.Chat.Api.Core
             return Task.CompletedTask;
         }
 
-        public virtual Task OnMessageAsync(WebSocket webSocket, WebSocketMessageType messageType, ArraySegment<byte> message)
+        public virtual Task OnMessageAsync(WebSocket webSocket, WebSocketMessageType messageType, ArraySegment<byte> data)
         {
             return Task.CompletedTask;
         }

@@ -3,13 +3,16 @@ using Microsoft.Extensions.Options;
 using Orleans;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using LibraProgramming.ChatRoom.Common.Hessian;
 using LibraProgramming.Services.Chat.Contracts;
 using LibraProgramming.Services.Chat.Contracts.Models;
+using LibraProgramming.Services.Chat.Domain.Messages;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Logging;
 using Orleans.Streams;
@@ -22,6 +25,8 @@ namespace LibraProgramming.ChatRoom.Services.Chat.Api.Core
         private readonly IChatRoomRegistry registry;
         private readonly ILogger<ChatRoomWebSocketHandler> logger;
         private readonly Encoding encoding;
+        private readonly DataContractHessianSerializer incomingSerializer;
+        private readonly DataContractHessianSerializer outgoingSerializer;
         private IAsyncStream<ChatMessage> stream;
         private StreamSubscriptionHandle<ChatMessage> subscription;
         private long roomId;
@@ -32,7 +37,14 @@ namespace LibraProgramming.ChatRoom.Services.Chat.Api.Core
             this.registry = registry;
             this.logger = logger;
 
+            var settings = new HessianSerializerSettings
+            {
+
+            };
+
             encoding = Encoding.UTF8;
+            incomingSerializer = new DataContractHessianSerializer(typeof(IncomingChatMessage), settings);
+            outgoingSerializer = new DataContractHessianSerializer(typeof(OutgoingChatMessage), settings);
         }
 
         public override async Task OnConnectAsync(WebSocket webSocket, RouteValueDictionary values)
@@ -63,19 +75,24 @@ namespace LibraProgramming.ChatRoom.Services.Chat.Api.Core
         }
 
         public override Task OnMessageAsync(WebSocket webSocket, WebSocketMessageType messageType,
-            ArraySegment<byte> message)
+            ArraySegment<byte> data)
         {
-            if (WebSocketMessageType.Text != messageType)
+            if (WebSocketMessageType.Binary != messageType)
             {
                 logger.LogDebug($"Unsupported message type: {messageType}");
                 return Task.CompletedTask;
             }
 
-            var text = encoding.GetString(message.Array);
+            IncomingChatMessage message;
+
+            using (var memoryStream = new MemoryStream(data.Array))
+            {
+                message = (IncomingChatMessage) incomingSerializer.ReadObject(memoryStream);
+            }
 
             return stream.OnNextAsync(new ChatMessage
             {
-                Content = text,
+                Content = message.Content,
                 Created = DateTime.UtcNow
             });
         }
@@ -90,14 +107,25 @@ namespace LibraProgramming.ChatRoom.Services.Chat.Api.Core
         {
             logger.LogDebug($"Message from stream: \"{message.Content}\"");
 
-            var bytes = encoding.GetBytes(message.Content);
-            var data = new ArraySegment<byte>(bytes);
+            ArraySegment<byte> data;
             var tasks = new List<Task>();
             var sockets = registry[roomId];
 
+            using (var memoryStream = new MemoryStream())
+            {
+                outgoingSerializer.WriteObject(memoryStream, new OutgoingChatMessage
+                {
+                    Author = String.Empty,
+                    Content = message.Content,
+                    Created = message.Created
+                });
+
+                data = new ArraySegment<byte>(memoryStream.ToArray());
+            }
+
             foreach (var webSocket in sockets)
             {
-                var task = webSocket.SendAsync(data, WebSocketMessageType.Text, true, CancellationToken.None);
+                var task = webSocket.SendAsync(data, WebSocketMessageType.Binary, true, CancellationToken.None);
                 tasks.Add(task);
             }
 

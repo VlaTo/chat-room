@@ -10,14 +10,15 @@
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="8.0.0" />
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="6.0.0" />
-    <PackageReference Include="Microsoft.AspNetCore.All" Version="2.2.1" />
+    <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.0" />
     <PackageReference Include="Microsoft.Orleans.Client" Version="2.2.0" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.2.1" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\Common\LibraProgramming.ChatRoom.Common.Hessian\Common.Hessian.csproj" />
     <ProjectReference Include="..\LibraProgramming.Services.Chat.Contracts\Chat.Contracts.csproj" />
-    <ProjectReference Include="..\LibraProgramming.Services.Chat.Domain\Web.Domain.csproj" />
+    <ProjectReference Include="..\LibraProgramming.Services.Chat.Domain\Chat.Domain.csproj" />
   </ItemGroup>
 
 </Project>

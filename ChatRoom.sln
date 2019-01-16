@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.28407.52
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.271
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Clients", "Clients", "{133C21FE-310E-49F0-8CC2-C2666CCEEFEF}"
 EndProject
@@ -15,7 +15,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Client.Common", "src\Client
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Client.Android", "src\Clients\LibraProgramming.ChatRoom.Client.Android\Client.Android.csproj", "{AE8DAD4D-DC6E-4E7F-9CB0-2B6EBF439699}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Web.Domain", "src\Services\Chat\LibraProgramming.Services.Chat.Domain\Web.Domain.csproj", "{48801D64-75CF-42FC-89E8-63D6E3B62440}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Chat.Domain", "src\Services\Chat\LibraProgramming.Services.Chat.Domain\Chat.Domain.csproj", "{48801D64-75CF-42FC-89E8-63D6E3B62440}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Chat.Contracts", "src\Services\Chat\LibraProgramming.Services.Chat.Contracts\Chat.Contracts.csproj", "{977F72E7-20AA-4532-971F-710F8DE5B92C}"
 EndProject
@@ -30,6 +30,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Client.UWP", "src\Clients\LibraProgramming.ChatRoom.Client.UWP\Client.UWP.csproj", "{1F70B8F7-2A88-4CC6-AD06-73F513CEA2A2}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{AC343DC1-09CB-4577-928A-7B2B606289D7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common.Hessian", "src\Common\LibraProgramming.ChatRoom.Common.Hessian\Common.Hessian.csproj", "{D8129692-4DA7-4AD4-A22D-7CCE9912F870}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -251,6 +255,30 @@ Global
 		{1F70B8F7-2A88-4CC6-AD06-73F513CEA2A2}.Release|x86.ActiveCfg = Release|x86
 		{1F70B8F7-2A88-4CC6-AD06-73F513CEA2A2}.Release|x86.Build.0 = Release|x86
 		{1F70B8F7-2A88-4CC6-AD06-73F513CEA2A2}.Release|x86.Deploy.0 = Release|x86
+		{D8129692-4DA7-4AD4-A22D-7CCE9912F870}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D8129692-4DA7-4AD4-A22D-7CCE9912F870}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D8129692-4DA7-4AD4-A22D-7CCE9912F870}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{D8129692-4DA7-4AD4-A22D-7CCE9912F870}.Debug|ARM.Build.0 = Debug|Any CPU
+		{D8129692-4DA7-4AD4-A22D-7CCE9912F870}.Debug|iPhone.ActiveCfg = Debug|Any CPU
+		{D8129692-4DA7-4AD4-A22D-7CCE9912F870}.Debug|iPhone.Build.0 = Debug|Any CPU
+		{D8129692-4DA7-4AD4-A22D-7CCE9912F870}.Debug|iPhoneSimulator.ActiveCfg = Debug|Any CPU
+		{D8129692-4DA7-4AD4-A22D-7CCE9912F870}.Debug|iPhoneSimulator.Build.0 = Debug|Any CPU
+		{D8129692-4DA7-4AD4-A22D-7CCE9912F870}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{D8129692-4DA7-4AD4-A22D-7CCE9912F870}.Debug|x64.Build.0 = Debug|Any CPU
+		{D8129692-4DA7-4AD4-A22D-7CCE9912F870}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{D8129692-4DA7-4AD4-A22D-7CCE9912F870}.Debug|x86.Build.0 = Debug|Any CPU
+		{D8129692-4DA7-4AD4-A22D-7CCE9912F870}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D8129692-4DA7-4AD4-A22D-7CCE9912F870}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D8129692-4DA7-4AD4-A22D-7CCE9912F870}.Release|ARM.ActiveCfg = Release|Any CPU
+		{D8129692-4DA7-4AD4-A22D-7CCE9912F870}.Release|ARM.Build.0 = Release|Any CPU
+		{D8129692-4DA7-4AD4-A22D-7CCE9912F870}.Release|iPhone.ActiveCfg = Release|Any CPU
+		{D8129692-4DA7-4AD4-A22D-7CCE9912F870}.Release|iPhone.Build.0 = Release|Any CPU
+		{D8129692-4DA7-4AD4-A22D-7CCE9912F870}.Release|iPhoneSimulator.ActiveCfg = Release|Any CPU
+		{D8129692-4DA7-4AD4-A22D-7CCE9912F870}.Release|iPhoneSimulator.Build.0 = Release|Any CPU
+		{D8129692-4DA7-4AD4-A22D-7CCE9912F870}.Release|x64.ActiveCfg = Release|Any CPU
+		{D8129692-4DA7-4AD4-A22D-7CCE9912F870}.Release|x64.Build.0 = Release|Any CPU
+		{D8129692-4DA7-4AD4-A22D-7CCE9912F870}.Release|x86.ActiveCfg = Release|Any CPU
+		{D8129692-4DA7-4AD4-A22D-7CCE9912F870}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -265,6 +293,7 @@ Global
 		{A26B9456-E10C-40AC-92DF-4ADC6FDB6DA0} = {5F2FB185-4442-4C91-8BA1-E569A1A3E308}
 		{DC042C3F-080D-49AA-8AC6-4F397CE79EA4} = {5F2FB185-4442-4C91-8BA1-E569A1A3E308}
 		{1F70B8F7-2A88-4CC6-AD06-73F513CEA2A2} = {133C21FE-310E-49F0-8CC2-C2666CCEEFEF}
+		{D8129692-4DA7-4AD4-A22D-7CCE9912F870} = {AC343DC1-09CB-4577-928A-7B2B606289D7}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {31C04DA9-8654-42C1-B8E0-705F624D42D8}

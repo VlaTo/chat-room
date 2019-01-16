@@ -30,17 +30,31 @@
                                 Margin="24,2,4,2"
                                 Padding="8,4">
                                 <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="Auto" />
                                         <RowDefinition Height="Auto" />
                                     </Grid.RowDefinitions>
                                     <Label
                                         Grid.Row="0"
+                                        Grid.Column="0"
                                         FontSize="Micro"
-                                        Text="Autor name"
+                                        Text="{Binding Path=Author, Mode=OneTime}"
+                                    />
+                                    <Label
+                                        Grid.Row="0"
+                                        Grid.Column="1"
+                                        FontSize="Micro"
+                                        HorizontalTextAlignment="End"
+                                        Text="{Binding Path=Created, Mode=OneTime}"
                                     />
                                     <Label
                                         Grid.Row="1"
+                                        Grid.Column="0"
+                                        Grid.ColumnSpan="2"
                                         FontSize="Default"
                                         Text="{Binding Path=Content, Mode=OneTime}"
                                     />

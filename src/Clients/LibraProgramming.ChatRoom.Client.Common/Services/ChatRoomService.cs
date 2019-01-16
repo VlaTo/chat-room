@@ -9,6 +9,8 @@ using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using LibraProgramming.ChatRoom.Common.Hessian;
+using LibraProgramming.Services.Chat.Domain.Messages;
 
 namespace LibraProgramming.ChatRoom.Client.Common.Services
 {
@@ -154,6 +156,8 @@ namespace LibraProgramming.ChatRoom.Client.Common.Services
         {
             private readonly ChatRoomService service;
             private readonly ClientWebSocket socket;
+            private readonly DataContractHessianSerializer incomingSerializer;
+            private readonly DataContractHessianSerializer outgoingSerializer;
             private readonly CancellationTokenSource cts;
             private Task receive;
             private bool disposed;
@@ -164,13 +168,31 @@ namespace LibraProgramming.ChatRoom.Client.Common.Services
             {
                 this.service = service;
                 this.socket = socket;
+
+                var settings = new HessianSerializerSettings
+                {
+                };
+
                 cts = new CancellationTokenSource();
+                incomingSerializer = new DataContractHessianSerializer(typeof(IncomingChatMessage), settings);
+                outgoingSerializer = new DataContractHessianSerializer(typeof(OutgoingChatMessage), settings);
             }
 
             public Task SendAsync(string text)
             {
-                var bytes = Encoding.UTF8.GetBytes(text);
-                return socket.SendAsync(new ArraySegment<byte>(bytes), WebSocketMessageType.Text, true, CancellationToken.None);
+                ArraySegment<byte> data;
+
+                using (var stream = new MemoryStream())
+                {
+                    incomingSerializer.WriteObject(stream, new IncomingChatMessage
+                    {
+                        Author = String.Empty,
+                        Content = text
+                    });
+                    data = new ArraySegment<byte>(stream.ToArray());
+                }
+
+                return socket.SendAsync(data, WebSocketMessageType.Binary, true, CancellationToken.None);
             }
 
             public void StartReceive()
@@ -181,7 +203,7 @@ namespace LibraProgramming.ChatRoom.Client.Common.Services
                 {
                     while (WebSocketState.Open == socket.State)
                     {
-                        ArraySegment<byte> message;
+                        ArraySegment<byte> data;
                         WebSocketReceiveResult result;
 
                         using (var stream = new MemoryStream())
@@ -196,13 +218,19 @@ namespace LibraProgramming.ChatRoom.Client.Common.Services
 
                             ct.ThrowIfCancellationRequested();
 
-                            message = new ArraySegment<byte>(stream.ToArray());
+                            data = new ArraySegment<byte>(stream.ToArray());
                         }
 
-                        if (0 < message.Count && WebSocketMessageType.Text == result.MessageType)
+                        if (0 < data.Count && WebSocketMessageType.Binary == result.MessageType)
                         {
-                            var text = Encoding.UTF8.GetString(message.Array);
-                            MessageArrived?.Invoke(this, new ChatMessageEventArgs(text));
+                            OutgoingChatMessage message;
+                            
+                            using (var stream = new MemoryStream(data.Array))
+                            {
+                                message = (OutgoingChatMessage) outgoingSerializer.ReadObject(stream);
+                            }
+
+                            MessageArrived?.Invoke(this, new ChatMessageEventArgs(message));
                         }
                     }
                 }, ct);
