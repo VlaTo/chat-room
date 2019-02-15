@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage 
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    x:Class="LibraProgramming.ChatRoom.Client.Views.MainPage"
+    Title="{Binding Path=Title}">
+    <ListView
+        IsRefreshing="{Binding Path=IsBusy, Mode=OneWay}"
+        CachingStrategy="RecycleElement"
+        ItemsSource="{Binding Path=Rooms}"
+        IsPullToRefreshEnabled="True"
+        RefreshCommand="{Binding Path=LoadRoomsCommand, Mode=OneTime}">
+        <ListView.ItemTemplate>
+            <DataTemplate>
+                <ViewCell>
+                    <Label
+                        FontSize="Small"
+                        Text="{Binding Path=Title, Mode=OneTime}"
+                    />
+                </ViewCell>
+            </DataTemplate>
+        </ListView.ItemTemplate>
+    </ListView>
+</ContentPage>

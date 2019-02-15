@@ -1,62 +1,48 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System;
-using System.IO;
-using System.Threading.Tasks;
-using AutoMapper;
+﻿using AutoMapper;
+using LibraProgramming.ChatRoom.Services.Chat.Api.Core.Commands;
+using LibraProgramming.ChatRoom.Services.Chat.Api.Core.Queries;
 using LibraProgramming.ChatRoom.Services.Chat.Api.Models;
-using LibraProgramming.Services.Chat.Contracts;
 using LibraProgramming.Services.Chat.Domain;
-using Orleans;
+using MediatR;
+using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Net;
+using System.Net.Mime;
+using System.Threading.Tasks;
 
 namespace LibraProgramming.ChatRoom.Services.Chat.Api.Controllers
 {
     /// <summary>
     /// 
     /// </summary>
-    [Produces("application/json")]
+    [Produces(MediaTypeNames.Application.Json)]
     [Route("api/[controller]")]
-    public sealed class RoomController : Controller
+    public sealed class RoomController : ControllerBase
     {
-        private readonly IClusterClient client;
+        private readonly IMediator mediator;
         private readonly IMapper mapper;
 
-        public RoomController(IClusterClient client, IMapper mapper)
+        public RoomController(
+            IMediator mediator,
+            IMapper mapper)
         {
-            this.client = client;
+            this.mediator = mediator;
             this.mapper = mapper;
         }
 
         /// <summary>
-        /// POST /api/room/
+        /// GET /api/room/id
         /// </summary>
-        /// <param name="request"></param>
-        /// <returns>
-        /// <see cref="RoomOperationResult" /> object with created room information.
-        /// </returns>
-        [HttpPost]
-        [Consumes("application/json")]
-        public async Task<IActionResult> Create([FromBody] RoomCreateRequest request)
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("{id:long}")]
+        [ProducesResponseType(typeof(RoomOperationResult), (int) HttpStatusCode.OK)]
+        public async Task<IActionResult> Get(long id)
         {
-            HttpContext.Request.Body.Seek(0L, SeekOrigin.Begin);
-
-            var temp = new StreamReader(HttpContext.Request.Body);
-
-            var temp1 = temp.ReadToEnd();
-
             try
             {
-                var resolver = client.GetGrain<IChatRoomResolver>(Constants.Resolvers.ChatRooms);
-                var id = await resolver.RegisterRoomAsync(request.Name);
-                var room = client.GetGrain<IChatRoom>(id);
-
-                await room.SetDescriptionAsync(request.Description);
-
-                return Json(mapper.Map<RoomOperationResult>(new RoomCreateResponse
-                {
-                    Id = id,
-                    Name = request.Name,
-                    Description = request.Description
-                }));
+                var room = await mediator.Send(new GetRoomQuery {Id = id});
+                return Ok(mapper.Map<RoomOperationResult>(room));
             }
             catch (Exception exception)
             {
@@ -68,40 +54,23 @@ namespace LibraProgramming.ChatRoom.Services.Chat.Api.Controllers
         /// PUT /api/room/room-id/
         /// </summary>
         /// <param name="id"></param>
-        /// <param name="request"></param>
+        /// <param name="model"></param>
         /// <returns></returns>
         [HttpPut("{id:long}")]
-        [Consumes("application/json")]
-        public async Task<IActionResult> Edit(long id, [FromBody] RoomEditRequest request)
+        [Consumes(MediaTypeNames.Application.Json)]
+        [ProducesResponseType((int) HttpStatusCode.OK)]
+        public async Task<IActionResult> Edit(long id, [FromBody] RoomDetailsModel model)
         {
             try
             {
-                if (null == request || false == ModelState.IsValid)
+                if (null == model || false == ModelState.IsValid)
                 {
                     return BadRequest("Invalid State");
                 }
 
-                var resolver = client.GetGrain<IChatRoomResolver>(Constants.Resolvers.ChatRooms);
-                var rooms = await resolver.GetRoomsAsync();
+                await mediator.Send(new EditRoomCommand(id, model.Name, model.Description));
 
-                if (false == rooms.ContainsKey(id))
-                {
-                    throw new InvalidOperationException();
-                }
-
-                var room = client.GetGrain<IChatRoom>(id);
-
-                await Task.WhenAll(
-                    resolver.RenameRoomAsync(id, request.Name),
-                    room.SetDescriptionAsync(request.Description)
-                );
-
-                return Json(mapper.Map<RoomOperationResult>(new RoomEditResponse
-                {
-                    Id = id,
-                    Name = request.Name,
-                    Description = request.Description
-                }));
+                return Ok();
             }
             catch (Exception exception)
             {
@@ -114,17 +83,12 @@ namespace LibraProgramming.ChatRoom.Services.Chat.Api.Controllers
         /// </summary>
         /// <param name="id"></param>
         [HttpDelete("{id:long}")]
+        [ProducesResponseType((int) HttpStatusCode.OK)]
         public async Task<IActionResult> Delete(long id)
         {
             try
             {
-                var resolver = client.GetGrain<IChatRoomResolver>(Constants.Resolvers.ChatRooms);
-
-                if (false == await resolver.RemoveRoomAsync(id))
-                {
-                    throw new InvalidOperationException();
-                }
-
+                await mediator.Send(new DeleteRoomCommand(id));
                 return Ok();
             }
             catch (Exception exception)

@@ -9,19 +9,36 @@ using Microsoft.Extensions.Logging;
 
 namespace LibraProgramming.ChatRoom.Services.Chat.Api.Core
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public class WebSocketsMiddleware
     {
         private readonly RequestDelegate next;
         private readonly WebSocketHandlerResolver resolver;
         private readonly ILogger logger;
 
-        public WebSocketsMiddleware(RequestDelegate next, WebSocketHandlerResolver resolver, ILogger logger)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="next"></param>
+        /// <param name="resolver"></param>
+        /// <param name="logger"></param>
+        public WebSocketsMiddleware(
+            RequestDelegate next, 
+            WebSocketHandlerResolver resolver, 
+            ILogger<WebSocketsMiddleware> logger)
         {
             this.next = next;
             this.resolver = resolver;
             this.logger = logger;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
         public Task Invoke(HttpContext context)
         {
             if (false == context.WebSockets.IsWebSocketRequest)

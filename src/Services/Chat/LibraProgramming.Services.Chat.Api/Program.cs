@@ -1,10 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
 using AutoMapper;
 using LibraProgramming.ChatRoom.Services.Chat.Api.Core;
+using LibraProgramming.ChatRoom.Services.Chat.Api.Core.Models;
 using LibraProgramming.ChatRoom.Services.Chat.Api.Extensions;
 using LibraProgramming.ChatRoom.Services.Chat.Api.Models;
 using LibraProgramming.Services.Chat.Contracts;
 using LibraProgramming.Services.Chat.Domain;
+using MediatR;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -83,7 +86,22 @@ namespace LibraProgramming.ChatRoom.Services.Chat.Api
                         .AddAutoMapper(options =>
                         {
                             options
-                                .CreateMap<RoomCreateResponse, RoomOperationResult>()
+                                .CreateMap<RoomDescription, RoomOperationResult>()
+                                .ForMember(
+                                    result => result.Id,
+                                    map => map.MapFrom(source => source.Id)
+                                )
+                                .ForMember(
+                                    result => result.Name,
+                                    map => map.MapFrom(source => source.Name)
+                                )
+                                .ForMember(
+                                    result => result.Description,
+                                    map => map.MapFrom(source => source.Description)
+                                );
+
+                            /*options
+                                .CreateMap<RoomCreatedResponse, RoomOperationResult>()
                                 .ForMember(
                                     result => result.Id,
                                     map => map.MapFrom(source => source.Id)
@@ -125,17 +143,19 @@ namespace LibraProgramming.ChatRoom.Services.Chat.Api
                                 .ForMember(
                                     result => result.Description,
                                     map => map.MapFrom(source => source.Description)
-                                );
-                        });
+                                );*/
+                        })
+                        .AddMediatR(
+                            typeof(Program).Assembly
+                        );
 
                     services
+                        .AddLogging()
                         .AddSingleton<IChatRoomRegistry, ChatRoomRegistry>()
                         .AddWebSocketHandlers(options =>
                         {
                             options.Register<ChatRoomWebSocketHandler>("api/chat/{room:long}");
-                        });
-
-                    services
+                        })
                         .AddMvcCore()
                         .AddJsonFormatters(options =>
                         {
@@ -149,10 +169,6 @@ namespace LibraProgramming.ChatRoom.Services.Chat.Api
 
                     if (environment.IsDevelopment())
                     {
-                        var logger = provider.GetRequiredService<ILogger<Program>>();
-
-                        logger.LogDebug("Application run in development mode");
-
                         app.UseDeveloperExceptionPage();
                     }
 
@@ -172,7 +188,6 @@ namespace LibraProgramming.ChatRoom.Services.Chat.Api
             using (var scope = host.Services.CreateScope())
             {
                 var services = scope.ServiceProvider;
-
             }
 
             host.Run();

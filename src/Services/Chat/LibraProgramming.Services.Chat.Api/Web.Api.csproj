@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
     <AssemblyName>LibraProgramming.ChatRoom.Services.Chat.Api</AssemblyName>
     <RootNamespace>LibraProgramming.ChatRoom.Services.Chat.Api</RootNamespace>
     <UserSecretsId>4d411d1f-3def-4968-bb54-fdea4e0dca91</UserSecretsId>
@@ -10,13 +10,16 @@
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="8.0.0" />
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="6.0.0" />
+    <PackageReference Include="LibraProgramming.Hessian" Version="0.1.0-dev" />
+    <PackageReference Include="MediatR" Version="6.0.0" />
+    <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="6.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="2.2.0" />
     <PackageReference Include="Microsoft.Orleans.Client" Version="2.2.0" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.2.1" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Common\LibraProgramming.ChatRoom.Common.Hessian\Common.Hessian.csproj" />
     <ProjectReference Include="..\LibraProgramming.Services.Chat.Contracts\Chat.Contracts.csproj" />
     <ProjectReference Include="..\LibraProgramming.Services.Chat.Domain\Chat.Domain.csproj" />
   </ItemGroup>

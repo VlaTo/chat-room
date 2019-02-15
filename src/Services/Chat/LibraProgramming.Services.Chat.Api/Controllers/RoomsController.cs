@@ -1,28 +1,34 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using AutoMapper;
-using LibraProgramming.ChatRoom.Services.Chat.Api.Models;
-using LibraProgramming.Services.Chat.Contracts;
+﻿using AutoMapper;
+using LibraProgramming.ChatRoom.Services.Chat.Api.Core.Commands;
+using LibraProgramming.ChatRoom.Services.Chat.Api.Core.Queries;
 using LibraProgramming.Services.Chat.Domain;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Orleans;
+using System;
+using System.Linq;
+using System.Net;
+using System.Net.Mime;
+using System.Threading.Tasks;
+using LibraProgramming.ChatRoom.Services.Chat.Api.Models;
 
 namespace LibraProgramming.ChatRoom.Services.Chat.Api.Controllers
 {
     /// <summary>
     /// 
     /// </summary>
-    [Produces("application/json")]
+    [Produces(MediaTypeNames.Application.Json)]
     [Route("api/[controller]")]
-    public class RoomsController : Controller
+    //[ApiController]
+    public sealed class RoomsController : ControllerBase
     {
-        private readonly IClusterClient client;
+        private readonly IMediator mediator;
         private readonly IMapper mapper;
 
-        public RoomsController(IClusterClient client, IMapper mapper)
+        public RoomsController(
+            IMediator mediator,
+            IMapper mapper)
         {
-            this.client = client;
+            this.mediator = mediator;
             this.mapper = mapper;
         }
 
@@ -32,31 +38,52 @@ namespace LibraProgramming.ChatRoom.Services.Chat.Api.Controllers
         /// <returns>
         /// </returns>
         [HttpGet]
+        [ProducesResponseType(typeof(RoomListOperationResult), (int) HttpStatusCode.OK)]
         public async Task<IActionResult> List()
         {
             try
             {
-                var resolver = client.GetGrain<IChatRoomResolver>(Constants.Resolvers.ChatRooms);
-                var rooms = await resolver.GetRoomsAsync();
-                var models = new List<RoomOperationResult>();
+                var rooms = await mediator.Send(new GetRoomsListQuery());
 
-                foreach (var (id, name) in rooms)
+                return Ok(new RoomListOperationResult
                 {
-                    var room = client.GetGrain<IChatRoom>(id);
-                    var description = await room.GetDescriptionAsync();
-
-                    models.Add(mapper.Map<RoomOperationResult>(new RoomResolveResponse
-                    {
-                        Id = id,
-                        Name = name,
-                        Description = description.Description
-                    }));
-                }
-
-                return Json(new RoomListOperationResult
-                {
-                    Rooms = models.ToArray()
+                    Rooms = rooms
+                        .Select(room => mapper.Map<RoomOperationResult>(room))
+                        .ToArray()
                 });
+            }
+            catch (Exception exception)
+            {
+                return BadRequest(exception.Message);
+            }
+        }
+
+        /// <summary>
+        /// POST /api/room/
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns>
+        /// <see cref="RoomOperationResult" /> object with created room information.
+        /// </returns>
+        [HttpPost]
+        [Consumes(MediaTypeNames.Application.Json)]
+        [ProducesResponseType(typeof(RoomOperationResult), (int) HttpStatusCode.Created)]
+        public async Task<IActionResult> Create([FromBody] RoomDetailsModel model)
+        {
+            if (false == ModelState.IsValid)
+            {
+                return BadRequest(model);
+            }
+
+            try
+            {
+                var id = await mediator.Send(new CreateRoomCommand(model.Name, model.Description));
+                var room = await mediator.Send(new GetRoomQuery {Id = id});
+
+                return Created(
+                    Url.Action("Get", "Room", new {id}),
+                    mapper.Map<RoomOperationResult>(room)
+                );
             }
             catch (Exception exception)
             {

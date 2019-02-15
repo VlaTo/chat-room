@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <AssemblyName>LibraProgramming.ChatRoom.Client</AssemblyName>
+    <RootNamespace>LibraProgramming.ChatRoom.Client</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="LibraProgramming.Hessian" Version="0.1.0-dev" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
+    <PackageReference Include="Xamarin.Forms" Version="3.2.0.839982" />
+    <PackageReference Include="Prism.Unity.Forms" Version="7.1.0.431" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Services\Chat\LibraProgramming.Services.Chat.Domain\Chat.Domain.csproj" />
+  </ItemGroup>
+
+</Project>
