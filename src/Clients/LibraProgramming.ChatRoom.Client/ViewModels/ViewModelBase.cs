@@ -5,17 +5,9 @@ namespace LibraProgramming.ChatRoom.Client.ViewModels
 {
     public abstract class ViewModelBase : BindableBase, INavigationAware, IDestructible
     {
-        private string _title;
-
         protected INavigationService NavigationService
         {
             get;
-        }
-
-        public string Title
-        {
-            get => _title;
-            set => SetProperty(ref _title, value);
         }
 
         protected ViewModelBase(INavigationService navigationService)

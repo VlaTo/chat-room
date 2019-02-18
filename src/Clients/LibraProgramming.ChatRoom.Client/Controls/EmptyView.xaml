@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<ContentView 
+    xmlns="http://xamarin.com/schemas/2014/forms" 
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    x:Class="LibraProgramming.ChatRoom.Client.Controls.EmptyView">
+    <ContentView.Content>
+        <StackLayout
+            HorizontalOptions="Center"
+            VerticalOptions="Center">
+            <Image>
+                <Image.Source>
+                    <OnPlatform x:TypeArguments="ImageSource">
+                        <On Platform="Android" Value="empty.png" />
+                        <On Platform="UWP" Value="Resources/empty.png" />
+                    </OnPlatform>
+                </Image.Source>
+            </Image>
+            <Label 
+                FontSize="Medium"
+                TextColor="{DynamicResource TextColorLight}"
+                Text="There is nothing here" 
+            />
+        </StackLayout>
+    </ContentView.Content>
+</ContentView>

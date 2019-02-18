@@ -28,8 +28,8 @@ namespace LibraProgramming.ChatRoom.Client.Services
         {
             try
             {
-                //var request = WebRequest.Create("http://192.168.1.127:5000/api/rooms/");
-                var request = WebRequest.Create("http://192.168.5.78:5000/api/rooms/");
+                var request = WebRequest.Create("http://192.168.1.110:5000/api/rooms/");
+                //var request = WebRequest.Create("http://192.168.5.78:5000/api/rooms/");
 
                 request.Method = WebRequestMethods.Http.Get;
 
@@ -62,6 +62,50 @@ namespace LibraProgramming.ChatRoom.Client.Services
                     }
 
                     return new ReadOnlyCollection<Models.ChatRoom>(list);
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e);
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="roomId"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        public async Task<Models.ChatRoom> GetRoomAsync(long roomId, CancellationToken ct)
+        {
+            try
+            {
+                var request = WebRequest.Create($"http://192.168.1.110:5000/api/room/{roomId}");
+
+                request.Method = WebRequestMethods.Http.Get;
+
+                using (var response = await request.GetResponseAsync())
+                {
+                    var http = (HttpWebResponse)response;
+
+                    if (HttpStatusCode.OK != http.StatusCode)
+                    {
+                        return null;
+                    }
+
+                    using (var stream = response.GetResponseStream())
+                    {
+                        var streamReader = new StreamReader(stream);
+
+                        using (var reader = new JsonTextReader(streamReader))
+                        {
+                            var serializer = new JsonSerializer();
+                            var result = serializer.Deserialize<RoomOperationResult>(reader);
+
+                            return new Models.ChatRoom(result.Id, result.Name, result.Description);
+                        }
+                    }
                 }
             }
             catch (Exception e)
@@ -137,7 +181,7 @@ namespace LibraProgramming.ChatRoom.Client.Services
         {
             var socket = new ClientWebSocket();
 
-            await socket.ConnectAsync(new Uri($"ws://192.168.1.127:5000/api/chat/{roomId}"), ct);
+            await socket.ConnectAsync(new Uri($"ws://192.168.1.110:5000/api/chat/{roomId}"), ct);
 
             var channel = new ChatChannel(this, socket);
 
@@ -188,6 +232,8 @@ namespace LibraProgramming.ChatRoom.Client.Services
                     });
                     data = new ArraySegment<byte>(stream.ToArray());
                 }
+
+                Debug.WriteLine($"[ChatRoomService.SendAsync] Sending packet (size: {data.Count} bytes)");
 
                 return socket.SendAsync(data, WebSocketMessageType.Binary, true, CancellationToken.None);
             }

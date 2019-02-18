@@ -1,24 +1,74 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<ContentPage 
+<ContentPage
     xmlns="http://xamarin.com/schemas/2014/forms"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:b="clr-namespace:Prism.Behaviors;assembly=Prism.Forms"
+    xmlns:system="clr-namespace:System;assembly=netstandard"
+    xmlns:prism="clr-namespace:Prism.Mvvm;assembly=Prism.Forms"
+    xmlns:local="clr-namespace:LibraProgramming.ChatRoom.Client.Controls"
     x:Class="LibraProgramming.ChatRoom.Client.Views.MainPage"
+    prism:ViewModelLocator.AutowireViewModel="True"
+    NavigationPage.HasNavigationBar="True"
+    IsBusy="{Binding Path=IsBusy, Mode=OneWay}"
     Title="{Binding Path=Title}">
-    <ListView
-        IsRefreshing="{Binding Path=IsBusy, Mode=OneWay}"
-        CachingStrategy="RecycleElement"
-        ItemsSource="{Binding Path=Rooms}"
-        IsPullToRefreshEnabled="True"
-        RefreshCommand="{Binding Path=LoadRoomsCommand, Mode=OneTime}">
-        <ListView.ItemTemplate>
-            <DataTemplate>
-                <ViewCell>
-                    <Label
-                        FontSize="Small"
-                        Text="{Binding Path=Title, Mode=OneTime}"
+    <ContentPage.ToolbarItems>
+        <ToolbarItem 
+            Priority="1"
+            Command="{Binding Path=RefreshRoomsCommand, Mode=OneTime}"
+            Text="Refresh"
+        />
+        <ToolbarItem
+            Priority="2"
+            Command="{Binding Path=AddRoomCommand, Mode=OneTime}"
+        />
+    </ContentPage.ToolbarItems>
+    <ContentPage.Content>
+        <Grid>
+            <local:EmptyView
+                HorizontalOptions="Center"
+                VerticalOptions="Center"
+                IsVisible="{Binding Path=IsEmpty, Mode=OneWay}"
+            />
+            <ListView
+                CachingStrategy="RecycleElement"
+                ItemsSource="{Binding Path=Rooms, Mode=OneWay}">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <ViewCell>
+                            <Grid
+                                Margin="4"
+                                Padding="8,4">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <Label
+                                    Grid.Row="0"
+                                    FontSize="Small"
+                                    Text="{Binding Path=Title, Mode=OneTime}"
+                                />
+                                <Label
+                                    Grid.Row="1"
+                                    Text="{Binding Path=Description, Mode=OneTime}">
+                                    <Label.FontSize>
+                                        <OnPlatform x:TypeArguments="system:Double">
+                                            <On Platform="Android" Value="Default" />
+                                            <On Platform="UWP" Value="14" />
+                                        </OnPlatform>
+                                    </Label.FontSize>
+                                </Label>
+                            </Grid>
+                        </ViewCell>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+                <ListView.Behaviors>
+                    <b:EventToCommandBehavior
+                        EventName="ItemTapped"
+                        EventArgsParameterPath="Item"
+                        Command="{Binding Path=NavigateCommand}"
                     />
-                </ViewCell>
-            </DataTemplate>
-        </ListView.ItemTemplate>
-    </ListView>
+                </ListView.Behaviors>
+            </ListView>
+        </Grid>
+    </ContentPage.Content>
 </ContentPage>

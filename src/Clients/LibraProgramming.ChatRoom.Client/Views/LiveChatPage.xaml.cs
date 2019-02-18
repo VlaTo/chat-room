@@ -1,8 +1,8 @@
 ﻿namespace LibraProgramming.ChatRoom.Client.Views
 {
-    public partial class MainPage
+    public partial class LiveChatPage
     {
-        public MainPage()
+        public LiveChatPage()
         {
             InitializeComponent();
         }

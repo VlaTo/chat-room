@@ -23,12 +23,17 @@ namespace LibraProgramming.ChatRoom.Services.Chat.Api.Core.Handlers
 
         public async Task<RoomDescription> Handle(GetRoomQuery request, CancellationToken cancellationToken)
         {
+            if (null == request)
+            {
+                throw new ArgumentNullException(nameof(request));
+            }
+
             var resolver = client.GetGrain<IChatRoomResolver>(Constants.Resolvers.ChatRooms);
             var rooms = await resolver.GetRoomsAsync();
 
             if (false == rooms.TryGetValue(request.Id, out var name))
             {
-                throw new InvalidOperationException();
+                return null;
             }
 
             var room = client.GetGrain<IChatRoom>(request.Id);

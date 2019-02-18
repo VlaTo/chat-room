@@ -19,6 +19,14 @@ namespace LibraProgramming.ChatRoom.Client.Services
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="roomId"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        Task<Models.ChatRoom> GetRoomAsync(long roomId, CancellationToken ct);
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="name"></param>
         /// <param name="description"></param>
         /// <param name="ct"></param>

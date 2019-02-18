@@ -1,0 +1,48 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage 
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:prism="clr-namespace:Prism.Mvvm;assembly=Prism.Forms"
+    x:Class="LibraProgramming.ChatRoom.Client.Views.LiveChatPage"
+    prism:ViewModelLocator.AutowireViewModel="True"
+    NavigationPage.HasNavigationBar="True"
+    NavigationPage.HasBackButton="True"
+    NavigationPage.BackButtonTitle="back"
+    Title="{Binding Path=Title}">
+    <NavigationPage.TitleIcon>
+        <OnPlatform x:TypeArguments="FileImageSource">
+            <On Platform="Android" Value="" />
+            <On Platform="UWP" Value="" />
+        </OnPlatform>
+    </NavigationPage.TitleIcon>
+    <ContentPage.ToolbarItems>
+
+    </ContentPage.ToolbarItems>
+    <ContentPage.Content>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <ListView
+                Grid.Row="0">
+            </ListView>
+            <Grid
+                Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Entry
+                    Grid.Column="0"
+                    Text="{Binding Path=Message, Mode=TwoWay}"
+                />
+                <Button
+                    Grid.Column="1"
+                    Command="{Binding Path=SendCommand, Mode=OneTime}"
+                    Text="Send"
+                />
+            </Grid>
+        </Grid>
+    </ContentPage.Content>
+</ContentPage>

@@ -42,6 +42,12 @@ namespace LibraProgramming.ChatRoom.Services.Chat.Api.Controllers
             try
             {
                 var room = await mediator.Send(new GetRoomQuery {Id = id});
+
+                if (null == room)
+                {
+                    return NotFound();
+                }
+
                 return Ok(mapper.Map<RoomOperationResult>(room));
             }
             catch (Exception exception)

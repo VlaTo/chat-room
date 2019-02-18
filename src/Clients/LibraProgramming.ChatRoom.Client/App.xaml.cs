@@ -1,4 +1,6 @@
-﻿using LibraProgramming.ChatRoom.Client.Services;
+﻿using System;
+using System.Diagnostics;
+using LibraProgramming.ChatRoom.Client.Services;
 using LibraProgramming.ChatRoom.Client.ViewModels;
 using LibraProgramming.ChatRoom.Client.Views;
 using Prism;
@@ -30,14 +32,22 @@ namespace LibraProgramming.ChatRoom.Client
         {
             InitializeComponent();
 
-            await NavigationService.NavigateAsync("NavigationPage/MainPage");
+            var result = await NavigationService.NavigateAsync($"{nameof(NavigationPage)}/{nameof(Views.MainPage)}");
+
+            if (false == result.Success)
+            {
+                throw result.Exception;
+            }
         }
 
         protected override void RegisterTypes(IContainerRegistry container)
         {
             container.Register<IChatRoomService, ChatRoomService>();
-            container.RegisterForNavigation<NavigationPage>();
-            container.RegisterForNavigation<MainPage, MainPageViewModel>();
+
+            //container.RegisterForNavigation<PrismNavigationPage>(nameof(PrismNavigationPage));
+            container.RegisterForNavigation<NavigationPage>(nameof(NavigationPage));
+            container.RegisterForNavigation<MainPage, MainPageViewModel>(nameof(Views.MainPage));
+            container.RegisterForNavigation<LiveChatPage, LiveChatPageViewModel>(nameof(LiveChatPage));
         }
     }
 }

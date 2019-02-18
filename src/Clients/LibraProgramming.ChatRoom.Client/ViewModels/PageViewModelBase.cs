@@ -4,6 +4,14 @@ namespace LibraProgramming.ChatRoom.Client.ViewModels
 {
     public class PageViewModelBase : ViewModelBase
     {
+        private string _title;
+
+        public string Title
+        {
+            get => _title;
+            set => SetProperty(ref _title, value);
+        }
+
         public PageViewModelBase(INavigationService navigationService)
             : base(navigationService)
         {

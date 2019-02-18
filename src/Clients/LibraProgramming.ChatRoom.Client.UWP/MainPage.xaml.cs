@@ -1,32 +1,27 @@
 ﻿using Prism;
 using Prism.Ioc;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Navigation;
+using Prism.Navigation;
+using Xamarin.Forms;
 
 namespace LibraProgramming.ChatRoom.Client.UWP
 {
-    public sealed partial class MainPage
+    /// <summary>
+    /// 
+    /// </summary>
+    public sealed partial class MainPage : IMasterDetailPageOptions
     {
+        public bool IsPresentedAfterNavigation => Device.Idiom != TargetIdiom.Phone;
+
         public MainPage()
         {
-            this.InitializeComponent();
-
-            LoadApplication(new LibraProgramming.ChatRoom.Client.App(new UwpInitializer()));
+            InitializeComponent();
+            LoadApplication(new Client.App(new UwpInitializer()));
         }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public class UwpInitializer : IPlatformInitializer
     {
         public void RegisterTypes(IContainerRegistry containerRegistry)

@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Diagnostics;
-using System.Threading;
-using System.Threading.Tasks;
-using LibraProgramming.ChatRoom.Client.Services;
+﻿using LibraProgramming.ChatRoom.Client.Services;
+using LibraProgramming.ChatRoom.Client.Views;
 using Prism.Commands;
 using Prism.Navigation;
+using System;
+using System.Collections.ObjectModel;
+using System.Threading;
+using Xamarin.Forms;
 
 namespace LibraProgramming.ChatRoom.Client.ViewModels
 {
@@ -14,6 +13,7 @@ namespace LibraProgramming.ChatRoom.Client.ViewModels
     {
         private readonly IChatRoomService roomService;
         private bool isBusy;
+        private bool isEmpty;
 
         /// <summary>
         /// 
@@ -26,7 +26,23 @@ namespace LibraProgramming.ChatRoom.Client.ViewModels
         /// <summary>
         /// 
         /// </summary>
-        public DelegateCommand LoadRoomsCommand
+        public DelegateCommand RefreshRoomsCommand
+        {
+            get;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public DelegateCommand AddRoomCommand
+        {
+            get;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public DelegateCommand<ChatRoomViewModel> NavigateCommand
         {
             get;
         }
@@ -38,6 +54,15 @@ namespace LibraProgramming.ChatRoom.Client.ViewModels
         {
             get => isBusy;
             set => SetProperty(ref isBusy, value);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public bool IsEmpty
+        {
+            get => isEmpty;
+            set => SetProperty(ref isEmpty, value);
         }
 
         public MainPageViewModel(
@@ -52,17 +77,41 @@ namespace LibraProgramming.ChatRoom.Client.ViewModels
 
             this.roomService = roomService;
 
-            Title = "Main Page";
+            Title = "Chats";
             Rooms = new ObservableCollection<ChatRoomViewModel>();
-            LoadRoomsCommand = new DelegateCommand(OnLoadRoomsCommand);
+            RefreshRoomsCommand = new DelegateCommand(OnRefreshRoomsCommand);
+            AddRoomCommand = new DelegateCommand(OnAddRoomCommand);
+            NavigateCommand = new DelegateCommand<ChatRoomViewModel>(OnNavigateCommand);
+            IsEmpty = true;
         }
 
         public override void OnNavigatedTo(INavigationParameters parameters)
         {
-            LoadRoomsCommand.Execute();
+           RefreshRoomsCommand.Execute();
         }
 
-        private async void OnLoadRoomsCommand()
+        private void OnAddRoomCommand()
+        {
+            throw new NotImplementedException();
+        }
+
+        private async void OnNavigateCommand(ChatRoomViewModel obj)
+        {
+            var args = new NavigationParameters
+            {
+                {"room", obj.Id}
+            };
+
+            var result = await NavigationService.NavigateAsync($"{nameof(NavigationPage)}/{nameof(LiveChatPage)}", args);
+            //var result = await NavigationService.NavigateAsync($"/{nameof(LiveChatPage)}", args);
+
+            if (false == result.Success)
+            {
+                throw result.Exception;
+            }
+        }
+
+        private async void OnRefreshRoomsCommand()
         {
             IsBusy = true;
 
@@ -71,6 +120,11 @@ namespace LibraProgramming.ChatRoom.Client.ViewModels
                 var rooms = await roomService.GetRoomsAsync(CancellationToken.None);
 
                 Rooms.Clear();
+
+                if (null == rooms)
+                {
+                    return;
+                }
 
                 foreach (var room in rooms)
                 {
@@ -83,6 +137,7 @@ namespace LibraProgramming.ChatRoom.Client.ViewModels
             }
             finally
             {
+                IsEmpty = 0 == Rooms.Count;
                 IsBusy = false;
             }
         }
