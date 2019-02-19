@@ -1,24 +1,21 @@
-﻿using Prism.Commands;
-using Prism.Mvvm;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading;
-using LibraProgramming.ChatRoom.Client.Services;
+﻿using LibraProgramming.ChatRoom.Client.Services;
+using Prism.Commands;
 using Prism.Navigation;
-using Prism.Navigation.Xaml;
+using System;
+using System.Collections.ObjectModel;
+using System.Security.Claims;
+using System.Security.Principal;
+using System.Threading;
 
 namespace LibraProgramming.ChatRoom.Client.ViewModels
 {
-    //[Con]
     public class LiveChatPageViewModel : PageViewModelBase
     {
         private readonly IChatRoomService chatService;
         private string description;
         private string message;
         private IChatChannel channel;
+        private IPrincipal author;
 
         public ObservableCollection<ChatMessageViewModel> Messages
         {
@@ -66,7 +63,12 @@ namespace LibraProgramming.ChatRoom.Client.ViewModels
             Title = room.Title;
             Description = room.Description;
 
-            channel = await chatService.OpenChatAsync(id, CancellationToken.None);
+            author = new GenericPrincipal(
+                new GenericIdentity($"User{(ushort) DateTime.Now.Ticks}", ClaimsIdentity.DefaultNameClaimType),
+                new[] {"Author"}
+            );
+
+            channel = await chatService.OpenChatAsync(id, author, CancellationToken.None);
             channel.MessageArrived += OnMessageArrived;
         }
 
@@ -78,12 +80,15 @@ namespace LibraProgramming.ChatRoom.Client.ViewModels
 
         private void OnSendCommand()
         {
-            channel.SendAsync(Message);
+            var message = Message;
             Message = String.Empty;
+            channel.SendAsync(message);
         }
 
         private void OnMessageArrived(object sender, ChatMessageEventArgs e)
         {
+            //Debug.WriteLine($"[LiveChatPageViewModel.OnMessageArrived] {e.Message.Content}");
+
             Messages.Add(new ChatMessageViewModel
             {
                 Author = e.Message.Author,

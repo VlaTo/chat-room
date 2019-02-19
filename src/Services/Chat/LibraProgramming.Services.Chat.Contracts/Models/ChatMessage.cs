@@ -8,6 +8,13 @@ namespace LibraProgramming.Services.Chat.Contracts.Models
     public sealed class ChatMessage
     {
         [DataMember]
+        public string Author
+        {
+            get;
+            set;
+        }
+
+        [DataMember]
         public DateTime Created
         {
             get;

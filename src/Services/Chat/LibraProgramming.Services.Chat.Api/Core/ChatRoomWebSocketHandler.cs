@@ -13,6 +13,7 @@ using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using LibraProgramming.ChatRoom.Common.Core;
 
 namespace LibraProgramming.ChatRoom.Services.Chat.Api.Core
 {
@@ -71,14 +72,16 @@ namespace LibraProgramming.ChatRoom.Services.Chat.Api.Core
             registry[room].Add(webSocket);
         }
 
-        public override Task OnMessageAsync(WebSocket webSocket, WebSocketMessageType messageType,
-            ArraySegment<byte> data)
+        public override Task OnMessageAsync(WebSocket webSocket, WebSocketMessageType messageType, ArraySegment<byte> data)
         {
             if (WebSocketMessageType.Binary != messageType)
             {
                 logger.LogDebug($"Unsupported message type: {messageType}");
                 return Task.CompletedTask;
             }
+
+            //logger.LogDebug($"[ChatRoomWebSocketHandler.OnMessageAsync] Received packet, size: {data.Count} bytes");
+            //MessageDebug.DebugWriteArray(logger, data.Array);
 
             IncomingChatMessage message;
 
@@ -87,8 +90,11 @@ namespace LibraProgramming.ChatRoom.Services.Chat.Api.Core
                 message = (IncomingChatMessage) incomingSerializer.ReadObject(memoryStream);
             }
 
+            logger.LogDebug($"[ChatRoomWebSocketHandler.OnMessageAsync] Author: \"{message.Author}\"; Content: \"{message.Content}\"");
+
             return stream.OnNextAsync(new ChatMessage
             {
+                Author = message.Author,
                 Content = message.Content,
                 Created = DateTime.UtcNow
             });
@@ -102,8 +108,6 @@ namespace LibraProgramming.ChatRoom.Services.Chat.Api.Core
 
         private Task OnStreamMessage(ChatMessage message, StreamSequenceToken sst)
         {
-            logger.LogDebug($"Message from stream: \"{message.Content}\"");
-
             ArraySegment<byte> data;
             var tasks = new List<Task>();
             var sockets = registry[roomId];
@@ -112,7 +116,7 @@ namespace LibraProgramming.ChatRoom.Services.Chat.Api.Core
             {
                 outgoingSerializer.WriteObject(memoryStream, new OutgoingChatMessage
                 {
-                    Author = String.Empty,
+                    Author = message.Author,
                     Content = message.Content,
                     Created = message.Created
                 });
@@ -122,6 +126,7 @@ namespace LibraProgramming.ChatRoom.Services.Chat.Api.Core
 
             foreach (var webSocket in sockets)
             {
+                logger.LogDebug($"[ChatRoomWebSocketHandler.OnStreamMessage] Sending to socket: {webSocket}, data length: {data.Count}");
                 var task = webSocket.SendAsync(data, WebSocketMessageType.Binary, true, CancellationToken.None);
                 tasks.Add(task);
             }

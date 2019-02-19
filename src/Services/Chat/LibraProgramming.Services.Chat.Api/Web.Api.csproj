@@ -10,7 +10,7 @@
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="8.0.0" />
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="6.0.0" />
-    <PackageReference Include="LibraProgramming.Hessian" Version="0.1.0-dev" />
+    <PackageReference Include="LibraProgramming.Hessian" Version="0.1.1-dev" />
     <PackageReference Include="MediatR" Version="6.0.0" />
     <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="6.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.0" />
@@ -20,6 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\Common\LibraProgramming.ChatRoom.Common.Core\LibraProgramming.ChatRoom.Common.Core.csproj" />
     <ProjectReference Include="..\LibraProgramming.Services.Chat.Contracts\Chat.Contracts.csproj" />
     <ProjectReference Include="..\LibraProgramming.Services.Chat.Domain\Chat.Domain.csproj" />
   </ItemGroup>

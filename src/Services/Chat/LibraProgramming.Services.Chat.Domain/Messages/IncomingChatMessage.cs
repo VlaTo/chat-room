@@ -3,20 +3,7 @@
 namespace LibraProgramming.Services.Chat.Domain.Messages
 {
     [DataContract]
-    public sealed class IncomingChatMessage
+    public sealed class IncomingChatMessage : MessageContentBase
     {
-        [DataMember]
-        public string Author
-        {
-            get;
-            set;
-        }
-
-        [DataMember]
-        public string Content
-        {
-            get;
-            set;
-        }
     }
 }

@@ -4,22 +4,8 @@ using System.Runtime.Serialization;
 namespace LibraProgramming.Services.Chat.Domain.Messages
 {
     [DataContract]
-    public sealed class OutgoingChatMessage
+    public sealed class OutgoingChatMessage : MessageContentBase
     {
-        [DataMember]
-        public string Author
-        {
-            get;
-            set;
-        }
-
-        [DataMember]
-        public string Content
-        {
-            get;
-            set;
-        }
-
         [DataMember]
         public DateTime Created
         {

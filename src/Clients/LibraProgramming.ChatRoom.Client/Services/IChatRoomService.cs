@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Security.Principal;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -31,14 +32,25 @@ namespace LibraProgramming.ChatRoom.Client.Services
         /// <param name="description"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        Task<Models.ChatRoom> SaveRoomAsync(string name, string description, CancellationToken ct);
+        Task<Models.ChatRoom> CreateRoomAsync(string name, string description, CancellationToken ct);
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="roomId"></param>
+        /// <param name="name"></param>
+        /// <param name="description"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        Task<IChatChannel> OpenChatAsync(long roomId, CancellationToken ct);
+        Task<Models.ChatRoom> SaveRoomAsync(long roomId, string name, string description, CancellationToken ct);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="roomId"></param>
+        /// <param name="principal"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        Task<IChatChannel> OpenChatAsync(long roomId, IPrincipal principal, CancellationToken ct);
     }
 }

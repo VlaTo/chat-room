@@ -1,6 +1,10 @@
-﻿using Prism;
+﻿using LibraProgramming.ChatRoom.Client.UWP.Extensions;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Debug;
+using Prism;
 using Prism.Ioc;
 using Prism.Navigation;
+using Prism.Unity;
 using Xamarin.Forms;
 
 namespace LibraProgramming.ChatRoom.Client.UWP
@@ -24,9 +28,17 @@ namespace LibraProgramming.ChatRoom.Client.UWP
     /// </summary>
     public class UwpInitializer : IPlatformInitializer
     {
-        public void RegisterTypes(IContainerRegistry containerRegistry)
+        public void RegisterTypes(IContainerRegistry container)
         {
             // Register any platform specific implementations
+            var unity = container.GetContainer();
+            unity.AddExtension(new LoggingExtension());
+
+            var factory = new LoggerFactory();
+
+            factory.AddProvider(new DebugLoggerProvider());
+
+            container.RegisterInstance(typeof(ILogger), factory.CreateLogger("Debug"));
         }
     }
 }

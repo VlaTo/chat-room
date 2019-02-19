@@ -99,51 +99,6 @@ namespace LibraProgramming.ChatRoom.Services.Chat.Api
                                     result => result.Description,
                                     map => map.MapFrom(source => source.Description)
                                 );
-
-                            /*options
-                                .CreateMap<RoomCreatedResponse, RoomOperationResult>()
-                                .ForMember(
-                                    result => result.Id,
-                                    map => map.MapFrom(source => source.Id)
-                                )
-                                .ForMember(
-                                    result => result.Name,
-                                    map => map.MapFrom(source => source.Name)
-                                )
-                                .ForMember(
-                                    result => result.Description,
-                                    map => map.MapFrom(source => source.Description)
-                                );
-
-                            options
-                                .CreateMap<RoomEditResponse, RoomOperationResult>()
-                                .ForMember(
-                                    result => result.Id,
-                                    map => map.MapFrom(source => source.Id)
-                                )
-                                .ForMember(
-                                    result => result.Name,
-                                    map => map.MapFrom(source => source.Name)
-                                )
-                                .ForMember(
-                                    result => result.Description,
-                                    map => map.MapFrom(source => source.Description)
-                                );
-
-                            options
-                                .CreateMap<RoomResolveResponse, RoomOperationResult>()
-                                .ForMember(
-                                    result => result.Id,
-                                    map => map.MapFrom(source => source.Id)
-                                )
-                                .ForMember(
-                                    result => result.Name,
-                                    map => map.MapFrom(source => source.Name)
-                                )
-                                .ForMember(
-                                    result => result.Description,
-                                    map => map.MapFrom(source => source.Description)
-                                );*/
                         })
                         .AddMediatR(
                             typeof(Program).Assembly

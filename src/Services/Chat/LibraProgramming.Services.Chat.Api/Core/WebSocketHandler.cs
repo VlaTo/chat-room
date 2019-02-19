@@ -7,19 +7,10 @@ namespace LibraProgramming.ChatRoom.Services.Chat.Api.Core
 {
     public abstract class WebSocketHandler
     {
-        public virtual Task OnConnectAsync(WebSocket webSocket, RouteValueDictionary value)
-        {
-            return Task.CompletedTask;
-        }
+        public abstract Task OnConnectAsync(WebSocket webSocket, RouteValueDictionary value);
 
-        public virtual Task OnMessageAsync(WebSocket webSocket, WebSocketMessageType messageType, ArraySegment<byte> data)
-        {
-            return Task.CompletedTask;
-        }
+        public abstract Task OnMessageAsync(WebSocket webSocket, WebSocketMessageType messageType, ArraySegment<byte> data);
 
-        public virtual Task OnDisconnectAsync(WebSocket webSocket)
-        {
-            return Task.CompletedTask;
-        }
+        public abstract Task OnDisconnectAsync(WebSocket webSocket);
     }
 }

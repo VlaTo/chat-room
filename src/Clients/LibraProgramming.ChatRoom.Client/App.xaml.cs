@@ -1,6 +1,4 @@
-﻿using System;
-using System.Diagnostics;
-using LibraProgramming.ChatRoom.Client.Services;
+﻿using LibraProgramming.ChatRoom.Client.Services;
 using LibraProgramming.ChatRoom.Client.ViewModels;
 using LibraProgramming.ChatRoom.Client.Views;
 using Prism;
@@ -43,7 +41,6 @@ namespace LibraProgramming.ChatRoom.Client
         protected override void RegisterTypes(IContainerRegistry container)
         {
             container.Register<IChatRoomService, ChatRoomService>();
-
             //container.RegisterForNavigation<PrismNavigationPage>(nameof(PrismNavigationPage));
             container.RegisterForNavigation<NavigationPage>(nameof(NavigationPage));
             container.RegisterForNavigation<MainPage, MainPageViewModel>(nameof(Views.MainPage));

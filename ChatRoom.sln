@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.28606.126
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.421
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Clients", "Clients", "{133C21FE-310E-49F0-8CC2-C2666CCEEFEF}"
 EndProject
@@ -33,7 +33,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatRoom.Client.Android", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatRoom.Client.UWP", "src\Clients\LibraProgramming.ChatRoom.Client.UWP\ChatRoom.Client.UWP.csproj", "{FCCB20B8-D417-4CF1-9404-9D6FE4D85AC8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LibraProgramming.ChatRoom.Common.Core", "src\Common\LibraProgramming.ChatRoom.Common.Core\LibraProgramming.ChatRoom.Common.Core.csproj", "{AE5AECB5-48F6-4E21-9E71-D0E90D824660}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LibraProgramming.ChatRoom.Common.Core", "src\Common\LibraProgramming.ChatRoom.Common.Core\LibraProgramming.ChatRoom.Common.Core.csproj", "{AE5AECB5-48F6-4E21-9E71-D0E90D824660}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
