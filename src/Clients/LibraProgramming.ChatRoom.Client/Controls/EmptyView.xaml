@@ -10,8 +10,8 @@
             <Image>
                 <Image.Source>
                     <OnPlatform x:TypeArguments="ImageSource">
-                        <On Platform="Android" Value="empty.png" />
-                        <On Platform="UWP" Value="Resources/empty.png" />
+                        <On Platform="Android" Value="baseline_face_24" />
+                        <On Platform="UWP" Value="baseline_face_48.png" />
                     </OnPlatform>
                 </Image.Source>
             </Image>

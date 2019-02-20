@@ -15,12 +15,25 @@
         <ToolbarItem 
             Priority="1"
             Command="{Binding Path=RefreshRoomsCommand, Mode=OneTime}"
-            Text="Refresh"
-        />
+            Text="Refresh">
+            <ToolbarItem.Icon>
+                <OnPlatform x:TypeArguments="FileImageSource">
+                    <On Platform="Android" Value="baseline_autorenew_24" />
+                    <On Platform="UWP" Value="baseline_autorenew_36.png" />
+                </OnPlatform>
+            </ToolbarItem.Icon>
+        </ToolbarItem>
         <ToolbarItem
             Priority="2"
             Command="{Binding Path=AddRoomCommand, Mode=OneTime}"
-        />
+            Text="Add">
+            <ToolbarItem.Icon>
+                <OnPlatform x:TypeArguments="FileImageSource">
+                    <On Platform="Android" Value="baseline_add_24" />
+                    <On Platform="UWP" Value="baseline_add_36.png" />
+                </OnPlatform>
+            </ToolbarItem.Icon>
+        </ToolbarItem>
     </ContentPage.ToolbarItems>
     <ContentPage.Content>
         <Grid>
@@ -35,29 +48,20 @@
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <ViewCell>
-                            <Grid
-                                Margin="4"
+                            <StackLayout
                                 Padding="8,4">
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto" />
-                                    <RowDefinition Height="Auto" />
-                                </Grid.RowDefinitions>
                                 <Label
-                                    Grid.Row="0"
-                                    FontSize="Small"
+                                    FontSize="Default"
                                     Text="{Binding Path=Title, Mode=OneTime}"
+                                    VerticalOptions="Center"
+                                    FontAttributes="Bold"
                                 />
                                 <Label
-                                    Grid.Row="1"
-                                    Text="{Binding Path=Description, Mode=OneTime}">
-                                    <Label.FontSize>
-                                        <OnPlatform x:TypeArguments="system:Double">
-                                            <On Platform="Android" Value="Default" />
-                                            <On Platform="UWP" Value="14" />
-                                        </OnPlatform>
-                                    </Label.FontSize>
-                                </Label>
-                            </Grid>
+                                    FontSize="Small"
+                                    Text="{Binding Path=Description, Mode=OneTime}"
+                                    VerticalOptions="Start"
+                                />
+                            </StackLayout>
                         </ViewCell>
                     </DataTemplate>
                 </ListView.ItemTemplate>

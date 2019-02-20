@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.WebSockets;
 using System.Security.Principal;
@@ -61,20 +62,14 @@ namespace LibraProgramming.ChatRoom.Client.Services
 
                     var list = new List<Models.ChatRoom>();
 
-                    using (var stream = response.GetResponseStream())
+                    using (var streamReader = response.GetResponseReader())
                     {
-                        var streamReader = new StreamReader(stream);
-
                         using (var reader = new JsonTextReader(streamReader))
                         {
                             var serializer = new JsonSerializer();
                             var result = serializer.Deserialize<RoomListOperationResult>(reader);
 
-                            foreach (var room in result.Rooms)
-                            {
-                                var model = new Models.ChatRoom(room.Id, room.Name, room.Description);
-                                list.Add(model);
-                            }
+                            list.AddRange(result.Rooms.Select(room => new Models.ChatRoom(room.Id, room.Name, room.Description)));
                         }
                     }
 

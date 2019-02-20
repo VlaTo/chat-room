@@ -32,24 +32,21 @@
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <ViewCell>
-                            <Frame>
-                                <Grid>
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="Auto" />
-                                        <RowDefinition Height="Auto" />
-                                    </Grid.RowDefinitions>
-                                    <Label
-                                        Grid.Row="0"
-                                        FontSize="Micro"
-                                        Text="{Binding Path=Author}"
-                                    />
-                                    <Label
-                                        Grid.Row="1"
-                                        FontSize="Default"
-                                        Text="{Binding Path=Text}"
-                                    />
-                                </Grid>
-                            </Frame>
+                            <StackLayout
+                                Orientation="Vertical"
+                                VerticalOptions="StartAndExpand"
+                                Margin="8,4">
+                                <Label
+                                    FontSize="Small"
+                                    Text="{Binding Path=Author, Mode=OneTime}"
+                                    FontAttributes="Bold"
+                                />
+                                <Label
+                                    FontSize="Small"
+                                    Text="{Binding Path=Text, Mode=OneTime}"
+                                    LineBreakMode="WordWrap"
+                                />
+                            </StackLayout>
                         </ViewCell>
                     </DataTemplate>
                 </ListView.ItemTemplate>
