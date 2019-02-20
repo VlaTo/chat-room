@@ -27,13 +27,17 @@ namespace LibraProgramming.ChatRoom.Client.Services
 
         [InjectionConstructor]
         public ChatRoomService()
-            : this(new Uri("http://192.168.5.78:5000/"))
-            //: this(new Uri("http://192.168.1.110:5000/"), logger)
+            : this(new Uri(null /* place your local IP web api here, for example 'http://192.168.0.0:5000'*/))
         {
         }
 
         private ChatRoomService(Uri serverRootUri)
         {
+            if (null == serverRootUri)
+            {
+                throw new ArgumentNullException(nameof(serverRootUri));
+            }
+
             this.serverRootUri = serverRootUri;
         }
 
@@ -107,10 +111,8 @@ namespace LibraProgramming.ChatRoom.Client.Services
                         return null;
                     }
 
-                    using (var stream = response.GetResponseStream())
+                    using (var streamReader = response.GetResponseReader())
                     {
-                        var streamReader = new StreamReader(stream);
-
                         using (var reader = new JsonTextReader(streamReader))
                         {
                             var serializer = new JsonSerializer();
@@ -157,17 +159,15 @@ namespace LibraProgramming.ChatRoom.Client.Services
 
                 using (var response = await request.GetResponseAsync())
                 {
-                    var http = (HttpWebResponse)response;
+                    var http = (HttpWebResponse) response;
 
                     if (HttpStatusCode.OK != http.StatusCode)
                     {
                         return null;
                     }
 
-                    using (var stream = response.GetResponseStream())
+                    using (var reader = response.GetResponseReader())
                     {
-                        var reader = new StreamReader(stream);
-
                         using (var r = new JsonTextReader(reader))
                         {
                             var serializer = new JsonSerializer();
