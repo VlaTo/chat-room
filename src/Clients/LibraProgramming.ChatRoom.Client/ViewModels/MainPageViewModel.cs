@@ -15,7 +15,7 @@ namespace LibraProgramming.ChatRoom.Client.ViewModels
     public class MainPageViewModel : PageViewModelBase
     {
         private readonly IChatRoomService roomService;
-        private InteractionRequest<>
+        private readonly InteractionRequest<AddNewRoomRequestContext> addNewRoomRequest;
         private bool isBusy;
         private bool isEmpty;
 
@@ -69,11 +69,16 @@ namespace LibraProgramming.ChatRoom.Client.ViewModels
             set => SetProperty(ref isEmpty, value);
         }
 
-        public IInteractionRequest AddNewRoomRequest
-        {
-            get;
-        }
+        /// <summary>
+        /// Gets or sets 
+        /// </summary>
+        public IInteractionRequest AddNewRoomRequest => addNewRoomRequest;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="navigationService"></param>
+        /// <param name="roomService"></param>
         public MainPageViewModel(
             INavigationService navigationService, 
             IChatRoomService roomService)
@@ -91,8 +96,8 @@ namespace LibraProgramming.ChatRoom.Client.ViewModels
             RefreshRoomsCommand = new DelegateCommand(OnRefreshRoomsCommand);
             AddRoomCommand = new DelegateCommand(OnAddRoomCommand);
             NavigateCommand = new DelegateCommand<ChatRoomViewModel>(OnNavigateCommand);
-            AddNewRoomRequest = new InteractionRequest();
             IsEmpty = true;
+            addNewRoomRequest = new InteractionRequest<AddNewRoomRequestContext>();
         }
 
         public override void OnNavigatedTo(INavigationParameters parameters)
@@ -102,9 +107,7 @@ namespace LibraProgramming.ChatRoom.Client.ViewModels
 
         private void OnAddRoomCommand()
         {
-            AddNewRoomRequest.Raised
-            Navigation. PushModelAsync()
-            throw new NotImplementedException();
+            addNewRoomRequest.Raise(new AddNewRoomRequestContext(), () => { });
         }
 
         private async void OnNavigateCommand(ChatRoomViewModel obj)

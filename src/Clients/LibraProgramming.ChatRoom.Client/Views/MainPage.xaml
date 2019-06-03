@@ -6,16 +6,16 @@
     xmlns:system="clr-namespace:System;assembly=netstandard"
     xmlns:prism="clr-namespace:Prism.Mvvm;assembly=Prism.Forms"
     xmlns:local="clr-namespace:LibraProgramming.ChatRoom.Client.Controls"
+    xmlns:xaml="http://prismlibrary.com"
     x:Class="LibraProgramming.ChatRoom.Client.Views.MainPage"
     prism:ViewModelLocator.AutowireViewModel="True"
     NavigationPage.HasNavigationBar="True"
     IsBusy="{Binding Path=IsBusy, Mode=OneWay}"
     Title="{Binding Path=Title}">
-    <ContentPage.Behaviors>
-
-    </ContentPage.Behaviors>
     <ContentPage.Triggers>
-        <local:InteractionRequestTrigger >
+        <local:InteractionRequestTrigger
+            InteractionRequest="{Binding Path=AddNewRoomRequest}">
+            <xaml:NavigateTo SourcePage="NavigationPage/AddNewRoomPage" UseModalNavigation="true" />
         </local:InteractionRequestTrigger>
     </ContentPage.Triggers>
     <!-- 
