@@ -130,17 +130,18 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Logging">
-      <Version>2.2.0</Version>
+      <Version>3.0.0-preview5.19227.9</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Logging.Debug">
-      <Version>2.2.0</Version>
+      <Version>3.0.0-preview5.19227.9</Version>
     </PackageReference>
-    <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform" Version="6.0.6" />
-    <PackageReference Include="Xamarin.Forms" Version="3.2.0.839982" />
-    <PackageReference Include="Prism.Unity.Forms" Version="7.1.0.431" />
+    <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform" Version="6.2.8" />
+    <PackageReference Include="Xamarin.Forms" Version="4.0.0.425677" />
+    <PackageReference Include="Prism.Unity.Forms" Version="7.2.0.1233-pre" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ChatRoom.Client.UWP_TemporaryKey.pfx" />
+    <None Include="ChatRoom.Client.UWP_TemporaryKey.pfx.snk" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\LibraProgramming.ChatRoom.Client\ChatRoom.Client.csproj">
@@ -155,7 +156,7 @@
     <SignAssembly>true</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyOriginatorKeyFile>ChatRoom.Client.UWP_TemporaryKey.pfx</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>ChatRoom.Client.UWP_TemporaryKey.pfx.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\WindowsXaml\v$(VisualStudioVersion)\Microsoft.Windows.UI.Xaml.CSharp.targets" />
 </Project>

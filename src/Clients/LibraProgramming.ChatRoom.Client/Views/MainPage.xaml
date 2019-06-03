@@ -11,6 +11,21 @@
     NavigationPage.HasNavigationBar="True"
     IsBusy="{Binding Path=IsBusy, Mode=OneWay}"
     Title="{Binding Path=Title}">
+    <ContentPage.Behaviors>
+
+    </ContentPage.Behaviors>
+    <ContentPage.Triggers>
+        <local:InteractionRequestTrigger >
+        </local:InteractionRequestTrigger>
+    </ContentPage.Triggers>
+    <!-- 
+    <interactivity:Interaction.Triggers>
+        <interaction:InteractionRequestTrigger
+            SourceObject="{Binding Path=ConfirmRequest}">
+            <int:ConfirmationPopupAction TargetName="ConfirmDialog" />
+        </interaction:InteractionRequestTrigger>
+    </interactivity:Interaction.Triggers>    
+    -->
     <ContentPage.ToolbarItems>
         <ToolbarItem 
             Priority="1"

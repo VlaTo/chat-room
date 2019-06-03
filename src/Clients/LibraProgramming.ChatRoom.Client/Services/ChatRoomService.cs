@@ -27,7 +27,7 @@ namespace LibraProgramming.ChatRoom.Client.Services
 
         [InjectionConstructor]
         public ChatRoomService()
-            : this(new Uri(null /* place your local IP web api here, for example 'http://192.168.0.0:5000'*/))
+            : this(new Uri("http://192.168.5.92:5000" /* place your local IP web api here, for example 'http://192.168.0.0:5000'*/))
         {
         }
 

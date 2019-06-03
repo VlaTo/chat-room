@@ -5,13 +5,17 @@ using Prism.Navigation;
 using System;
 using System.Collections.ObjectModel;
 using System.Threading;
+using LibraProgramming.ChatRoom.Client.Controls;
+using Prism.Navigation.Xaml;
 using Xamarin.Forms;
+using NavigationParameters = Prism.Navigation.NavigationParameters;
 
 namespace LibraProgramming.ChatRoom.Client.ViewModels
 {
     public class MainPageViewModel : PageViewModelBase
     {
         private readonly IChatRoomService roomService;
+        private InteractionRequest<>
         private bool isBusy;
         private bool isEmpty;
 
@@ -65,6 +69,11 @@ namespace LibraProgramming.ChatRoom.Client.ViewModels
             set => SetProperty(ref isEmpty, value);
         }
 
+        public IInteractionRequest AddNewRoomRequest
+        {
+            get;
+        }
+
         public MainPageViewModel(
             INavigationService navigationService, 
             IChatRoomService roomService)
@@ -82,16 +91,19 @@ namespace LibraProgramming.ChatRoom.Client.ViewModels
             RefreshRoomsCommand = new DelegateCommand(OnRefreshRoomsCommand);
             AddRoomCommand = new DelegateCommand(OnAddRoomCommand);
             NavigateCommand = new DelegateCommand<ChatRoomViewModel>(OnNavigateCommand);
+            AddNewRoomRequest = new InteractionRequest();
             IsEmpty = true;
         }
 
         public override void OnNavigatedTo(INavigationParameters parameters)
         {
-           RefreshRoomsCommand.Execute();
+            RefreshRoomsCommand.Execute();
         }
 
         private void OnAddRoomCommand()
         {
+            AddNewRoomRequest.Raised
+            Navigation. PushModelAsync()
             throw new NotImplementedException();
         }
 
