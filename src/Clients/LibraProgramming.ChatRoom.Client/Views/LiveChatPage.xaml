@@ -59,13 +59,23 @@
                 </Grid.ColumnDefinitions>
                 <Entry
                     Grid.Column="0"
+                    x:Name="MessageEntry"
                     Text="{Binding Path=Message, Mode=TwoWay}"
+                    Placeholder="Message..."
                 />
                 <Button
                     Grid.Column="1"
                     Command="{Binding Path=SendCommand, Mode=OneTime}"
-                    Text="Send"
-                />
+                    Text="Send">
+                    <Button.Triggers>
+                        <DataTrigger
+                            TargetType="Button"
+                            Binding="{Binding Source={x:Reference MessageEntry}, Path=Text.Length, Mode=OneWay}"
+                            Value="0">
+                            <Setter Property="IsEnabled" Value="false" />
+                        </DataTrigger>
+                    </Button.Triggers>
+                </Button>
             </Grid>
         </Grid>
     </ContentPage.Content>

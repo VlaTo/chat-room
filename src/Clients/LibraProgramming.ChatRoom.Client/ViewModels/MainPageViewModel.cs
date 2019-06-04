@@ -15,7 +15,7 @@ namespace LibraProgramming.ChatRoom.Client.ViewModels
     public class MainPageViewModel : PageViewModelBase
     {
         private readonly IChatRoomService roomService;
-        private InteractionRequest<>
+        private InteractionRequest<AddNewRoomRequestContext> addNewRoomRequest;
         private bool isBusy;
         private bool isEmpty;
 
@@ -69,11 +69,16 @@ namespace LibraProgramming.ChatRoom.Client.ViewModels
             set => SetProperty(ref isEmpty, value);
         }
 
-        public IInteractionRequest AddNewRoomRequest
-        {
-            get;
-        }
+        /// <summary>
+        /// 
+        /// </summary>
+        public IInteractionRequest AddNewRoomRequest => addNewRoomRequest;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="navigationService"></param>
+        /// <param name="roomService"></param>
         public MainPageViewModel(
             INavigationService navigationService, 
             IChatRoomService roomService)
@@ -85,13 +90,13 @@ namespace LibraProgramming.ChatRoom.Client.ViewModels
             }
 
             this.roomService = roomService;
+            addNewRoomRequest = new InteractionRequest<AddNewRoomRequestContext>();
 
             Title = "Chats";
             Rooms = new ObservableCollection<ChatRoomViewModel>();
             RefreshRoomsCommand = new DelegateCommand(OnRefreshRoomsCommand);
             AddRoomCommand = new DelegateCommand(OnAddRoomCommand);
             NavigateCommand = new DelegateCommand<ChatRoomViewModel>(OnNavigateCommand);
-            AddNewRoomRequest = new InteractionRequest();
             IsEmpty = true;
         }
 
@@ -100,11 +105,22 @@ namespace LibraProgramming.ChatRoom.Client.ViewModels
             RefreshRoomsCommand.Execute();
         }
 
-        private void OnAddRoomCommand()
+        private async void OnAddRoomCommand()
         {
-            AddNewRoomRequest.Raised
-            Navigation. PushModelAsync()
-            throw new NotImplementedException();
+            /*var args = new NavigationParameters
+            {
+                {"room", obj.Id}
+            };*/
+
+            var result = await NavigationService.NavigateAsync(
+                $"{nameof(NavigationPage)}/{nameof(AddNewRoomPage)}",
+                useModalNavigation: true
+            );
+
+            if (false == result.Success)
+            {
+                throw result.Exception;
+            }
         }
 
         private async void OnNavigateCommand(ChatRoomViewModel obj)

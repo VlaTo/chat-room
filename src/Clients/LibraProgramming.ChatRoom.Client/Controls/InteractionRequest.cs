@@ -3,8 +3,9 @@ using Xamarin.Forms;
 
 namespace LibraProgramming.ChatRoom.Client.Controls
 {
-    public class InteractionRequest : BindableObject, IInteractionRequest
+    public class InteractionRequest : BindableObject, IInteractionRequest, IAttachedObject
     {
+        //public static readonly BindableProperty 
         public event EventHandler<InteractionRequestedEventArgs> Raised;
 
         public InteractionRequest()
@@ -20,6 +21,16 @@ namespace LibraProgramming.ChatRoom.Client.Controls
                 handler.Invoke(this, e);
             }
         }
+
+        public void AttachTo(BindableObject bindable)
+        {
+            ;
+        }
+
+        public void DetachFrom(BindableObject bindable)
+        {
+            ;
+        }
     }
 
     public class InteractionRequest<TInteraction> : InteractionRequest
@@ -27,7 +38,12 @@ namespace LibraProgramming.ChatRoom.Client.Controls
     {
         public void Raise(TInteraction interaction, Action callback)
         {
-            DoRaiseEvent(new InteractionRequestedEventArgs(callback));
+            if (null == interaction)
+            {
+                throw new ArgumentNullException(nameof(interaction));
+            }
+
+            DoRaiseEvent(new InteractionRequestedEventArgs(interaction, callback.Invoke));
         }
     }
 }

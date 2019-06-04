@@ -4,13 +4,19 @@ namespace LibraProgramming.ChatRoom.Client.Controls
 {
     public class InteractionRequestedEventArgs : EventArgs
     {
+        public InteractionRequestContext Context
+        {
+            get;
+        }
+
         public Action Callback
         {
             get;
         }
 
-        public InteractionRequestedEventArgs(Action callback)
+        public InteractionRequestedEventArgs(InteractionRequestContext context, Action callback)
         {
+            Context = context;
             Callback = callback;
         }
     }

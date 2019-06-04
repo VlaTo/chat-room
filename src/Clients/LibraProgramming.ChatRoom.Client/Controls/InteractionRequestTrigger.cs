@@ -2,13 +2,12 @@
 
 namespace LibraProgramming.ChatRoom.Client.Controls
 {
-    public class InteractionRequestTrigger : TriggerBase
+    public class InteractionRequestTrigger<TRequestContext> : InteractionRequestTriggerBase<TRequestContext>
+        where TRequestContext : InteractionRequestContext
     {
         public InteractionRequestTrigger()
+            : base(typeof(VisualElement))
         {
-            EnterActions
         }
-
-
     }
 }

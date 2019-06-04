@@ -45,6 +45,7 @@ namespace LibraProgramming.ChatRoom.Client
             container.RegisterForNavigation<NavigationPage>(nameof(NavigationPage));
             container.RegisterForNavigation<MainPage, MainPageViewModel>(nameof(Views.MainPage));
             container.RegisterForNavigation<LiveChatPage, LiveChatPageViewModel>(nameof(LiveChatPage));
+            container.RegisterForNavigation<AddNewRoomPage, AddNewRoomViewModel>(nameof(AddNewRoomPage));
         }
     }
 }
