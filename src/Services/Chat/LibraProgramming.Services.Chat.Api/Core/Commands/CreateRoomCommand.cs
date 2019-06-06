@@ -2,7 +2,7 @@
 
 namespace LibraProgramming.ChatRoom.Services.Chat.Api.Core.Commands
 {
-    public class CreateRoomCommand : IRequest<long>
+    internal sealed class CreateRoomCommand : IRequest<long>
     {
         public string Name
         {

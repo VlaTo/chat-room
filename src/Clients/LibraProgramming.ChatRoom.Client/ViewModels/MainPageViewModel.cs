@@ -114,7 +114,8 @@ namespace LibraProgramming.ChatRoom.Client.ViewModels
 
             var result = await NavigationService.NavigateAsync(
                 $"{nameof(NavigationPage)}/{nameof(AddNewRoomPage)}",
-                useModalNavigation: true
+                useModalNavigation: true,
+                animated: true
             );
 
             if (false == result.Success)
@@ -130,8 +131,9 @@ namespace LibraProgramming.ChatRoom.Client.ViewModels
                 {"room", obj.Id}
             };
 
-            var result = await NavigationService.NavigateAsync($"{nameof(NavigationPage)}/{nameof(LiveChatPage)}", args);
-            //var result = await NavigationService.NavigateAsync($"/{nameof(LiveChatPage)}", args);
+            //var navigationUrl = $"{nameof(NavigationPage)}/{nameof(LiveChatPage)}";
+            var navigationUrl = $"{nameof(LiveChatPage)}";
+            var result = await NavigationService.NavigateAsync(navigationUrl, args, false);
 
             if (false == result.Success)
             {
@@ -145,7 +147,7 @@ namespace LibraProgramming.ChatRoom.Client.ViewModels
 
             try
             {
-                var rooms = await roomService.GetRoomsAsync(CancellationToken.None);
+                var rooms = await roomService.GetRoomsAsync();
 
                 Rooms.Clear();
 

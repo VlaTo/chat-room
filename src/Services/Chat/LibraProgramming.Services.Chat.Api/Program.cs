@@ -1,9 +1,9 @@
 ﻿using AutoMapper;
+using LibraProgramming.ChatRoom.Domain.Results;
 using LibraProgramming.ChatRoom.Services.Chat.Api.Core;
 using LibraProgramming.ChatRoom.Services.Chat.Api.Core.Models;
 using LibraProgramming.ChatRoom.Services.Chat.Api.Extensions;
 using LibraProgramming.Services.Chat.Contracts;
-using LibraProgramming.Services.Chat.Domain;
 using MediatR;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Builder;
@@ -13,7 +13,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json.Serialization;
 using Orleans;
 using Orleans.Configuration;
 using Orleans.Hosting;
@@ -85,8 +84,24 @@ namespace LibraProgramming.ChatRoom.Services.Chat.Api
                     services
                         .AddAutoMapper(options =>
                             {
+                                // action results
                                 options
-                                    .CreateMap<RoomDescription, RoomOperationResult>()
+                                    .CreateMap<RoomDescription, RoomCreatedResult>()
+                                    .ForMember(
+                                        result => result.Id,
+                                        map => map.MapFrom(source => source.Id)
+                                    )
+                                    .ForMember(
+                                        result => result.Name,
+                                        map => map.MapFrom(source => source.Name)
+                                    )
+                                    .ForMember(
+                                        result => result.Description,
+                                        map => map.MapFrom(source => source.Description)
+                                    );
+
+                                options
+                                    .CreateMap<RoomDescription, RoomResult>()
                                     .ForMember(
                                         result => result.Id,
                                         map => map.MapFrom(source => source.Id)

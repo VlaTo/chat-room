@@ -9,7 +9,8 @@ using System.Threading.Tasks;
 
 namespace LibraProgramming.ChatRoom.Services.Chat.Api.Core.Handlers
 {
-    public sealed class GetRoomsListQueryHandler : IRequestHandler<GetRoomsListQuery, IEnumerable<RoomDescription>>
+    // ReSharper disable once UnusedMember.Global
+    internal sealed class GetRoomsListQueryHandler : IRequestHandler<GetRoomsQuery, IEnumerable<RoomDescription>>
     {
         private readonly IClusterClient client;
 
@@ -18,7 +19,7 @@ namespace LibraProgramming.ChatRoom.Services.Chat.Api.Core.Handlers
             this.client = client;
         }
 
-        public async Task<IEnumerable<RoomDescription>> Handle(GetRoomsListQuery request, CancellationToken ct)
+        public async Task<IEnumerable<RoomDescription>> Handle(GetRoomsQuery request, CancellationToken ct)
         {
             var resolver = client.GetGrain<IChatRoomResolver>(Constants.Resolvers.ChatRooms);
             var rooms = await resolver.GetRoomsAsync();

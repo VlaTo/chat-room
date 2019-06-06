@@ -15,9 +15,6 @@
             <On Platform="UWP" Value="" />
         </OnPlatform>
     </NavigationPage.TitleIcon>
-    <ContentPage.ToolbarItems>
-
-    </ContentPage.ToolbarItems>
     <ContentPage.Content>
         <Grid>
             <Grid.RowDefinitions>

@@ -2,7 +2,7 @@
 
 namespace LibraProgramming.ChatRoom.Services.Chat.Api.Core.Commands
 {
-    public class EditRoomCommand : IRequest
+    internal sealed class EditRoomCommand : IRequest
     {
 
         public long Id

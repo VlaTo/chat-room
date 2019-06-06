@@ -13,26 +13,23 @@ namespace LibraProgramming.ChatRoom.Client.Services
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="ct"></param>
         /// <returns></returns>
-        Task<IReadOnlyList<Models.ChatRoom>> GetRoomsAsync(CancellationToken ct);
+        Task<IReadOnlyList<Models.ChatRoom>> GetRoomsAsync();
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="roomId"></param>
-        /// <param name="ct"></param>
         /// <returns></returns>
-        Task<Models.ChatRoom> GetRoomAsync(long roomId, CancellationToken ct);
+        Task<Models.ChatRoom> GetRoomAsync(long roomId);
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="name"></param>
         /// <param name="description"></param>
-        /// <param name="ct"></param>
         /// <returns></returns>
-        Task<Models.ChatRoom> CreateRoomAsync(string name, string description, CancellationToken ct);
+        Task<Models.ChatRoom> CreateRoomAsync(string name, string description);
 
         /// <summary>
         /// 
@@ -42,7 +39,7 @@ namespace LibraProgramming.ChatRoom.Client.Services
         /// <param name="description"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        Task<Models.ChatRoom> SaveRoomAsync(long roomId, string name, string description, CancellationToken ct);
+        Task SaveRoomAsync(long roomId, string name, string description);
 
         /// <summary>
         /// 

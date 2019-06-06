@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
@@ -14,8 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Common\LibraProgramming.ChatRoom.Common.Core\LibraProgramming.ChatRoom.Common.Core.csproj" />
-    <ProjectReference Include="..\..\Services\Chat\LibraProgramming.Services.Chat.Domain\Chat.Domain.csproj" />
+    <ProjectReference Include="..\..\Common\LibraProgramming.ChatRoom.Domain\LibraProgramming.ChatRoom.Domain.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -10,7 +10,8 @@ namespace LibraProgramming.ChatRoom.Services.Chat.Api.Core.Handlers
     /// <summary>
     /// 
     /// </summary>
-    public sealed class CreateRoomCommandHandler : IRequestHandler<CreateRoomCommand, long>
+    // ReSharper disable once UnusedMember.Global
+    internal sealed class CreateRoomCommandHandler : IRequestHandler<CreateRoomCommand, long>
     {
         private readonly IClusterClient client;
 

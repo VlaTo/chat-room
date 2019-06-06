@@ -11,7 +11,8 @@ namespace LibraProgramming.ChatRoom.Services.Chat.Api.Core.Handlers
     /// <summary>
     /// 
     /// </summary>
-    public sealed class EditRoomCommandHandler : IRequestHandler<EditRoomCommand>
+    // ReSharper disable once UnusedMember.Global
+    internal sealed class EditRoomCommandHandler : IRequestHandler<EditRoomCommand>
     {
         private readonly IClusterClient client;
 

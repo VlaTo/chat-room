@@ -1,6 +1,6 @@
 ﻿namespace LibraProgramming.ChatRoom.Services.Chat.Api.Core.Models
 {
-    public sealed class RoomDescription
+    internal sealed class RoomDescription
     {
         public long Id
         {

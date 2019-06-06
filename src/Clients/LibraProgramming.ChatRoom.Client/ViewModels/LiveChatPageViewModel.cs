@@ -66,7 +66,7 @@ namespace LibraProgramming.ChatRoom.Client.ViewModels
         public override async void OnNavigatedTo(INavigationParameters parameters)
         {
             var id = parameters.GetValue<long>("room");
-            var room = await chatService.GetRoomAsync(id, CancellationToken.None);
+            var room = await chatService.GetRoomAsync(id);
 
             if (null == room)
             {

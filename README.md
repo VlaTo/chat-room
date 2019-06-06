@@ -5,4 +5,4 @@ Simple chat room project to play with Microsoft Orleans and Xamarin.Forms (Andri
 [![Build Status](https://dev.azure.com/vladimirtolmachev/vladimirtolmachev/_apis/build/status/VlaTo.chat-room?branchName=master)](https://dev.azure.com/vladimirtolmachev/vladimirtolmachev/_build/latest?definitionId=1?branchName=master)
 
 # Details
-The chat logic is implemented as `Microsoft Orleans` grains aka `Actors` and hosted in *Silo*. Web API implemented as ASP.NET Core Web Api server and presented to the chat clients (Android and UWP). When user enters a chat messages is transfered by `WebSocket` technique.
+The chat logic is implemented as `Microsoft Orleans` grains aka `Actors` and hosted in *Silo*. Web API implemented as ASP.NET Core Web Api server and presented to the chat clients (Android and UWP). When user enters a chat messages is transfered by `WebSocket` technique. https://mindofai.github.io/Creating-Custom-Controls-with-Bindable-Properties-in-Xamarin.Forms/

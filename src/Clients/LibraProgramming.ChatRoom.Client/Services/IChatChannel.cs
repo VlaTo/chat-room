@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
-using LibraProgramming.Services.Chat.Domain.Messages;
+using LibraProgramming.ChatRoom.Domain.Messages;
 
 namespace LibraProgramming.ChatRoom.Client.Services
 {

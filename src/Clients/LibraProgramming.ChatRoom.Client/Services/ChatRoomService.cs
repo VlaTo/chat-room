@@ -1,6 +1,7 @@
-﻿using LibraProgramming.Serialization.Hessian;
-using LibraProgramming.Services.Chat.Domain;
-using LibraProgramming.Services.Chat.Domain.Messages;
+﻿using LibraProgramming.ChatRoom.Domain.Messages;
+using LibraProgramming.ChatRoom.Domain.Models;
+using LibraProgramming.ChatRoom.Domain.Results;
+using LibraProgramming.Serialization.Hessian;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -13,7 +14,6 @@ using System.Net.WebSockets;
 using System.Security.Principal;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
 using Unity.Attributes;
 
 namespace LibraProgramming.ChatRoom.Client.Services
@@ -44,9 +44,8 @@ namespace LibraProgramming.ChatRoom.Client.Services
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="ct"></param>
         /// <returns></returns>
-        public async Task<IReadOnlyList<Models.ChatRoom>> GetRoomsAsync(CancellationToken ct)
+        public async Task<IReadOnlyList<Models.ChatRoom>> GetRoomsAsync()
         {
             try
             {
@@ -66,14 +65,18 @@ namespace LibraProgramming.ChatRoom.Client.Services
 
                     var list = new List<Models.ChatRoom>();
 
-                    using (var streamReader = response.GetResponseReader())
+                    using (var reader = new JsonTextReader(response.GetResponseReader()))
                     {
-                        using (var reader = new JsonTextReader(streamReader))
-                        {
-                            var serializer = new JsonSerializer();
-                            var result = serializer.Deserialize<RoomListOperationResult>(reader);
+                        var serializer = new JsonSerializer();
+                        var result = serializer.Deserialize<RoomsResult>(reader);
 
-                            list.AddRange(result.Rooms.Select(room => new Models.ChatRoom(room.Id, room.Name, room.Description)));
+                        if (null != result)
+                        {
+                            var rooms = result.Rooms.Select(
+                                room => new Models.ChatRoom(room.Id, room.Name, room.Description)
+                            );
+
+                            list.AddRange(rooms);
                         }
                     }
 
@@ -93,7 +96,7 @@ namespace LibraProgramming.ChatRoom.Client.Services
         /// <param name="roomId"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        public async Task<Models.ChatRoom> GetRoomAsync(long roomId, CancellationToken ct)
+        public async Task<Models.ChatRoom> GetRoomAsync(long roomId)
         {
             try
             {
@@ -116,7 +119,7 @@ namespace LibraProgramming.ChatRoom.Client.Services
                         using (var reader = new JsonTextReader(streamReader))
                         {
                             var serializer = new JsonSerializer();
-                            var result = serializer.Deserialize<RoomOperationResult>(reader);
+                            var result = serializer.Deserialize<RoomResult>(reader);
 
                             return new Models.ChatRoom(result.Id, result.Name, result.Description);
                         }
@@ -134,7 +137,7 @@ namespace LibraProgramming.ChatRoom.Client.Services
         /// 
         /// </summary>
         /// <returns></returns>
-        public async Task<Models.ChatRoom> CreateRoomAsync(string name, string description, CancellationToken ct)
+        public async Task<Models.ChatRoom> CreateRoomAsync(string name, string description)
         {
             try
             {
@@ -146,12 +149,14 @@ namespace LibraProgramming.ChatRoom.Client.Services
 
                 using (var stream = await request.GetRequestStreamAsync())
                 {
-                    var writer = new StreamWriter(stream);
-
-                    using (var w = new JsonTextWriter(writer))
+                    using (var w = new JsonTextWriter(new StreamWriter(stream)))
                     {
                         var serializer = new JsonSerializer();
-                        var room = new {Name = name, Description = description};
+                        var room = new RoomDetails
+                        {
+                            Name = name,
+                            Description = description
+                        };
 
                         serializer.Serialize(w, room);
                     }
@@ -159,22 +164,14 @@ namespace LibraProgramming.ChatRoom.Client.Services
 
                 using (var response = await request.GetResponseAsync())
                 {
-                    var http = (HttpWebResponse) response;
+                    var http = response.EnsureSuccessResult();
 
-                    if (HttpStatusCode.OK != http.StatusCode)
+                    using (var reader = new JsonTextReader(http.GetResponseReader()))
                     {
-                        return null;
-                    }
+                        var serializer = new JsonSerializer();
+                        var result = serializer.Deserialize<RoomCreatedResult>(reader);
 
-                    using (var reader = response.GetResponseReader())
-                    {
-                        using (var r = new JsonTextReader(reader))
-                        {
-                            var serializer = new JsonSerializer();
-                            var result = serializer.Deserialize<RoomOperationResult>(r);
-
-                            return new Models.ChatRoom(result.Id, result.Name, result.Description);
-                        }
+                        return new Models.ChatRoom(result.Id, result.Name, result.Description);
                     }
                 }
             }
@@ -189,7 +186,7 @@ namespace LibraProgramming.ChatRoom.Client.Services
         /// 
         /// </summary>
         /// <returns></returns>
-        public async Task<Models.ChatRoom> SaveRoomAsync(long roomId, string name, string description, CancellationToken ct)
+        public async Task SaveRoomAsync(long roomId, string name, string description)
         {
             try
             {
@@ -201,44 +198,28 @@ namespace LibraProgramming.ChatRoom.Client.Services
 
                 using (var stream = await request.GetRequestStreamAsync())
                 {
-                    var writer = new StreamWriter(stream);
-
-                    using (var w = new JsonTextWriter(writer))
+                    using (var writer = new JsonTextWriter(new StreamWriter(stream)))
                     {
                         var serializer = new JsonSerializer();
-                        var room = new {Name = name, Description = description};
+                        var room = new RoomDetails
+                        {
+                            Name = name,
+                            Description = description
+                        };
 
-                        serializer.Serialize(w, room);
+                        serializer.Serialize(writer, room);
                     }
                 }
 
                 using (var response = await request.GetResponseAsync())
                 {
-                    var http = (HttpWebResponse)response;
-
-                    if (HttpStatusCode.OK != http.StatusCode)
-                    {
-                        return null;
-                    }
-
-                    using (var stream = response.GetResponseStream())
-                    {
-                        var reader = new StreamReader(stream);
-
-                        using (var r = new JsonTextReader(reader))
-                        {
-                            var serializer = new JsonSerializer();
-                            var result = serializer.Deserialize<RoomOperationResult>(r);
-
-                            return new Models.ChatRoom(result.Id, result.Name, result.Description);
-                        }
-                    }
+                    response.EnsureSuccessResult();
                 }
             }
             catch (Exception e)
             {
                 Debug.WriteLine(e);
-                return null;
+                throw ;
             }
         }
 
@@ -275,8 +256,11 @@ namespace LibraProgramming.ChatRoom.Client.Services
             private readonly ChatRoomService service;
             private readonly ClientWebSocket socket;
             private readonly IPrincipal principal;
-            private readonly DataContractHessianSerializer incomingSerializer;
-            private readonly DataContractHessianSerializer outgoingSerializer;
+
+            private readonly HessianSerializerSettings settings;
+
+            //private readonly DataContractHessianSerializer incomingSerializer;
+            //private readonly DataContractHessianSerializer outgoingSerializer;
             private readonly CancellationTokenSource cts;
             private Task receive;
             private bool disposed;
@@ -292,10 +276,11 @@ namespace LibraProgramming.ChatRoom.Client.Services
                 this.service = service;
                 this.socket = socket;
                 this.principal = principal;
+                this.settings = settings;
 
                 cts = new CancellationTokenSource();
-                incomingSerializer = new DataContractHessianSerializer(typeof(IncomingChatMessage), settings);
-                outgoingSerializer = new DataContractHessianSerializer(typeof(OutgoingChatMessage), settings);
+                //incomingSerializer = new DataContractHessianSerializer(typeof(IncomingChatMessage), settings);
+                //outgoingSerializer = new DataContractHessianSerializer(typeof(OutgoingChatMessage), settings);
             }
 
             public Task SendAsync( string text)
@@ -304,11 +289,14 @@ namespace LibraProgramming.ChatRoom.Client.Services
 
                 using (var stream = new MemoryStream())
                 {
-                    incomingSerializer.WriteObject(stream, new IncomingChatMessage
+                    var serializer = new DataContractHessianSerializer(typeof(IncomingChatMessage), settings);
+
+                    serializer.WriteObject(stream, new IncomingChatMessage
                     {
                         Author = principal.Identity.Name,
                         Content = text
                     });
+
                     data = new ArraySegment<byte>(stream.ToArray());
                 }
 
@@ -347,7 +335,8 @@ namespace LibraProgramming.ChatRoom.Client.Services
                             
                             using (var stream = new MemoryStream(data.Array))
                             {
-                                message = (OutgoingChatMessage) outgoingSerializer.ReadObject(stream);
+                                var serializer = new DataContractHessianSerializer(typeof(OutgoingChatMessage), settings);
+                                message = serializer.ReadObject(stream) as OutgoingChatMessage;
                             }
 
                             MessageArrived?.Invoke(this, new ChatMessageEventArgs(message));

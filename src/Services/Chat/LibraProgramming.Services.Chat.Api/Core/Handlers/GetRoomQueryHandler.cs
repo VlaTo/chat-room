@@ -12,7 +12,8 @@ namespace LibraProgramming.ChatRoom.Services.Chat.Api.Core.Handlers
     /// <summary>
     /// 
     /// </summary>
-    public sealed class GetRoomQueryHandler : IRequestHandler<GetRoomQuery, RoomDescription>
+    // ReSharper disable once UnusedMember.Global
+    internal sealed class GetRoomQueryHandler : IRequestHandler<GetRoomQuery, RoomDescription>
     {
         private readonly IClusterClient client;
 

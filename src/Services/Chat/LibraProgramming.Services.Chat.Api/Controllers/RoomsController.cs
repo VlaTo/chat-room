@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
+using LibraProgramming.ChatRoom.Domain.Models;
+using LibraProgramming.ChatRoom.Domain.Results;
 using LibraProgramming.ChatRoom.Services.Chat.Api.Core.Commands;
 using LibraProgramming.ChatRoom.Services.Chat.Api.Core.Queries;
-using LibraProgramming.Services.Chat.Domain;
+using LibraProgramming.ChatRoom.Services.Chat.Api.Models;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -9,7 +11,6 @@ using System.Linq;
 using System.Net;
 using System.Net.Mime;
 using System.Threading.Tasks;
-using LibraProgramming.ChatRoom.Services.Chat.Api.Models;
 
 namespace LibraProgramming.ChatRoom.Services.Chat.Api.Controllers
 {
@@ -38,17 +39,17 @@ namespace LibraProgramming.ChatRoom.Services.Chat.Api.Controllers
         /// <returns>
         /// </returns>
         [HttpGet]
-        [ProducesResponseType(typeof(RoomListOperationResult), (int) HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(RoomsResult), (int) HttpStatusCode.OK)]
         public async Task<IActionResult> List()
         {
             try
             {
-                var rooms = await mediator.Send(new GetRoomsListQuery());
+                var rooms = await mediator.Send(new GetRoomsQuery());
 
-                return Ok(new RoomListOperationResult
+                return Ok(new RoomsResult
                 {
                     Rooms = rooms
-                        .Select(room => mapper.Map<RoomOperationResult>(room))
+                        .Select(room => mapper.Map<RoomDetails>(room))
                         .ToArray()
                 });
             }
@@ -59,16 +60,14 @@ namespace LibraProgramming.ChatRoom.Services.Chat.Api.Controllers
         }
 
         /// <summary>
-        /// POST /api/room/
+        /// 
         /// </summary>
         /// <param name="model"></param>
-        /// <returns>
-        /// <see cref="RoomOperationResult" /> object with created room information.
-        /// </returns>
+        /// <returns><see cref="RoomCreatedResult" /> object with created room information.</returns>
         [HttpPost]
         [Consumes(MediaTypeNames.Application.Json)]
-        [ProducesResponseType(typeof(RoomOperationResult), (int) HttpStatusCode.Created)]
-        public async Task<IActionResult> Create([FromBody] RoomDetailsModel model)
+        [ProducesResponseType(typeof(RoomCreatedResult), (int) HttpStatusCode.Created)]
+        public async Task<IActionResult> Create([FromBody] CreateRoomModel model)
         {
             if (false == ModelState.IsValid)
             {
@@ -78,11 +77,11 @@ namespace LibraProgramming.ChatRoom.Services.Chat.Api.Controllers
             try
             {
                 var id = await mediator.Send(new CreateRoomCommand(model.Name, model.Description));
-                var room = await mediator.Send(new GetRoomQuery {Id = id});
+                var room = await mediator.Send(new GetRoomQuery(id));
 
                 return Created(
                     Url.Action("Get", "Room", new {id}),
-                    mapper.Map<RoomOperationResult>(room)
+                    mapper.Map<RoomCreatedResult>(room)
                 );
             }
             catch (Exception exception)

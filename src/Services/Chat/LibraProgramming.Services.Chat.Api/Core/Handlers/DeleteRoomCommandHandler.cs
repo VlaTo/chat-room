@@ -11,7 +11,8 @@ namespace LibraProgramming.ChatRoom.Services.Chat.Api.Core.Handlers
     /// <summary>
     /// 
     /// </summary>
-    public sealed class DeleteRoomCommandHandler : IRequestHandler<DeleteRoomCommand>
+    // ReSharper disable once UnusedMember.Global
+    internal sealed class DeleteRoomCommandHandler : IRequestHandler<DeleteRoomCommand>
     {
         private readonly IClusterClient client;
 

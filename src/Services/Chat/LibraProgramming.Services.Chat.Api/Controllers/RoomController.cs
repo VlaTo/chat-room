@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
+using LibraProgramming.ChatRoom.Domain.Results;
 using LibraProgramming.ChatRoom.Services.Chat.Api.Core.Commands;
 using LibraProgramming.ChatRoom.Services.Chat.Api.Core.Queries;
 using LibraProgramming.ChatRoom.Services.Chat.Api.Models;
-using LibraProgramming.Services.Chat.Domain;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -36,19 +36,19 @@ namespace LibraProgramming.ChatRoom.Services.Chat.Api.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("{id:long}")]
-        [ProducesResponseType(typeof(RoomOperationResult), (int) HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(RoomResult), (int) HttpStatusCode.OK)]
         public async Task<IActionResult> Get(long id)
         {
             try
             {
-                var room = await mediator.Send(new GetRoomQuery {Id = id});
+                var room = await mediator.Send(new GetRoomQuery(id));
 
                 if (null == room)
                 {
                     return NotFound();
                 }
 
-                return Ok(mapper.Map<RoomOperationResult>(room));
+                return Ok(mapper.Map<RoomResult>(room));
             }
             catch (Exception exception)
             {
@@ -65,7 +65,7 @@ namespace LibraProgramming.ChatRoom.Services.Chat.Api.Controllers
         [HttpPut("{id:long}")]
         [Consumes(MediaTypeNames.Application.Json)]
         [ProducesResponseType((int) HttpStatusCode.OK)]
-        public async Task<IActionResult> Edit(long id, [FromBody] RoomDetailsModel model)
+        public async Task<IActionResult> Edit(long id, [FromBody] EditRoomModel model)
         {
             try
             {

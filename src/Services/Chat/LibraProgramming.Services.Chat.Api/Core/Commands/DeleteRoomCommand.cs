@@ -2,7 +2,7 @@
 
 namespace LibraProgramming.ChatRoom.Services.Chat.Api.Core.Commands
 {
-    public sealed class DeleteRoomCommand : IRequest
+    internal sealed class DeleteRoomCommand : IRequest
     {
         public long Id
         {

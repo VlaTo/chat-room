@@ -6,11 +6,48 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
     x:Class="LibraProgramming.ChatRoom.Client.Views.AddNewRoomPage">
+    <ContentPage.Padding>
+        <OnPlatform x:TypeArguments="Thickness">
+            <On Platform="Android" Value="0,40,0,0" />
+            <On Platform="UWP" Value="32" />
+        </OnPlatform>
+    </ContentPage.Padding>
+    <ContentPage.ToolbarItems>
+        <ToolbarItem 
+            Priority="1"
+            Command="{Binding Path=CancelCommand, Mode=OneTime}"
+            Text="Cancel">
+            <ToolbarItem.Icon>
+                <OnPlatform x:TypeArguments="FileImageSource">
+                    <On Platform="Android" Value="arrow_left" />
+                    <On Platform="UWP" Value="baseline_arrow-left_black_36.png" />
+                </OnPlatform>
+            </ToolbarItem.Icon>
+        </ToolbarItem>
+    </ContentPage.ToolbarItems>
     <ContentPage.Content>
         <StackLayout>
-            <Label Text="Welcome to Xamarin.Forms!"
-                VerticalOptions="CenterAndExpand" 
-                HorizontalOptions="CenterAndExpand" />
+            <Entry
+                x:Name="RoomName"
+                Placeholder="Room name..."
+                Text="{Binding Path=RoomName, Mode=TwoWay}"
+            />
+            <Entry
+                Placeholder="Description..."
+                Text="{Binding Path=Description, Mode=TwoWay}"
+            />
+            <Button
+                Command="{Binding Path=AddRoomCommand, Mode=OneTime}"
+                Text="Add Room">
+                <Button.Triggers>
+                    <DataTrigger
+                        TargetType="Button"
+                        Binding="{Binding Source={x:Reference RoomName}, Path=Text.Length, Mode=OneWay}"
+                        Value="0">
+                        <Setter Property="IsEnabled" Value="false" />
+                    </DataTrigger>
+                </Button.Triggers>
+            </Button>
         </StackLayout>
     </ContentPage.Content>
 </ContentPage>

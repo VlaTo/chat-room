@@ -21,7 +21,7 @@ namespace LibraProgramming.ChatRoom.Client.Controls
 
                 if (null != bindable.BindingContext)
                 {
-                    BindingContextChanged(bindable, EventArgs.Empty);
+                    DoBindingContextChanged(bindable, EventArgs.Empty);
                 }
             }
         }
@@ -46,7 +46,7 @@ namespace LibraProgramming.ChatRoom.Client.Controls
             handler(this, new EventArgs());
         }
 
-        private void BindingContextChanged(object sender, EventArgs e)
+        private void DoBindingContextChanged(object sender, EventArgs e)
         {
             /*var element = sender as FrameworkElement;
 

@@ -1,7 +1,7 @@
-﻿using LibraProgramming.Serialization.Hessian;
+﻿using LibraProgramming.ChatRoom.Domain.Messages;
+using LibraProgramming.Serialization.Hessian;
 using LibraProgramming.Services.Chat.Contracts;
 using LibraProgramming.Services.Chat.Contracts.Models;
-using LibraProgramming.Services.Chat.Domain.Messages;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Logging;
 using Orleans;
@@ -13,7 +13,6 @@ using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using LibraProgramming.ChatRoom.Common.Core;
 
 namespace LibraProgramming.ChatRoom.Services.Chat.Api.Core
 {
@@ -23,8 +22,9 @@ namespace LibraProgramming.ChatRoom.Services.Chat.Api.Core
         private readonly IChatRoomRegistry registry;
         private readonly ILogger<ChatRoomWebSocketHandler> logger;
         private readonly Encoding encoding;
-        private readonly DataContractHessianSerializer incomingSerializer;
-        private readonly DataContractHessianSerializer outgoingSerializer;
+        //private readonly DataContractHessianSerializer incomingSerializer;
+        //private readonly DataContractHessianSerializer outgoingSerializer;
+        private HessianSerializerSettings settings;
         private IAsyncStream<ChatMessage> stream;
         private StreamSubscriptionHandle<ChatMessage> subscription;
         private long roomId;
@@ -35,14 +35,13 @@ namespace LibraProgramming.ChatRoom.Services.Chat.Api.Core
             this.registry = registry;
             this.logger = logger;
 
-            var settings = new HessianSerializerSettings
+            encoding = Encoding.UTF8;
+            settings = new HessianSerializerSettings
             {
-
             };
 
-            encoding = Encoding.UTF8;
-            incomingSerializer = new DataContractHessianSerializer(typeof(IncomingChatMessage), settings);
-            outgoingSerializer = new DataContractHessianSerializer(typeof(OutgoingChatMessage), settings);
+            //incomingSerializer = new DataContractHessianSerializer(typeof(IncomingChatMessage), settings);
+            //outgoingSerializer = new DataContractHessianSerializer(typeof(OutgoingChatMessage), settings);
         }
 
         public override async Task OnConnectAsync(WebSocket webSocket, RouteValueDictionary values)
@@ -87,7 +86,8 @@ namespace LibraProgramming.ChatRoom.Services.Chat.Api.Core
 
             using (var memoryStream = new MemoryStream(data.Array))
             {
-                message = (IncomingChatMessage) incomingSerializer.ReadObject(memoryStream);
+                var serializer = new DataContractHessianSerializer(typeof(IncomingChatMessage), settings);
+                message = (IncomingChatMessage) serializer.ReadObject(memoryStream);
             }
 
             logger.LogDebug($"[ChatRoomWebSocketHandler.OnMessageAsync] Author: \"{message.Author}\"; Content: \"{message.Content}\"");
@@ -114,7 +114,9 @@ namespace LibraProgramming.ChatRoom.Services.Chat.Api.Core
 
             using (var memoryStream = new MemoryStream())
             {
-                outgoingSerializer.WriteObject(memoryStream, new OutgoingChatMessage
+                var serializer = new DataContractHessianSerializer(typeof(OutgoingChatMessage), settings);
+
+                serializer.WriteObject(memoryStream, new OutgoingChatMessage
                 {
                     Author = message.Author,
                     Content = message.Content,
