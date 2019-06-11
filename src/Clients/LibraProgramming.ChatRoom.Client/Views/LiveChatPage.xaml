@@ -8,9 +8,7 @@
     xmlns:system="clr-namespace:System;assembly=netstandard"
     x:Class="LibraProgramming.ChatRoom.Client.Views.LiveChatPage"
     prism:ViewModelLocator.AutowireViewModel="True"
-    NavigationPage.HasNavigationBar="True"
     NavigationPage.HasBackButton="True"
-    NavigationPage.BackButtonTitle="back"
     Title="{Binding Path=Title}">
     <NavigationPage.TitleIcon>
         <OnPlatform x:TypeArguments="FileImageSource">
@@ -44,21 +42,43 @@
                             <StackLayout
                                 Orientation="Vertical"
                                 VerticalOptions="StartAndExpand"
-                                Margin="8,4">
+                                Padding="8,4">
                                 <StackLayout.Triggers>
-                                    <MultiTrigger>
+                                    <MultiTrigger TargetType="StackLayout">
                                         <MultiTrigger.Conditions>
                                             <BindingCondition
-                                                Binding="{Binding Path=MyMessage, Mode=OneTime}"
+                                                Binding="{Binding Path=IsMyMessage, Mode=OneTime}"
                                                 Value="true"
                                             />
                                         </MultiTrigger.Conditions>
                                         <Setter Property="Margin">
                                             <OnPlatform x:TypeArguments="Thickness">
                                                 <On Platform="Android" Value="8,4" />
-                                                <On Platform="UWP" Value="24,8,8,8" />
+                                                <On Platform="UWP" Value="48,8,8,8" />
                                             </OnPlatform>
                                         </Setter>
+                                        <Setter
+                                            Property="BackgroundColor"
+                                            Value="AntiqueWhite"
+                                        />
+                                    </MultiTrigger>
+                                    <MultiTrigger TargetType="StackLayout">
+                                        <MultiTrigger.Conditions>
+                                            <BindingCondition
+                                                Binding="{Binding Path=IsMyMessage, Mode=OneTime}"
+                                                Value="false"
+                                            />
+                                        </MultiTrigger.Conditions>
+                                        <Setter Property="Margin">
+                                            <OnPlatform x:TypeArguments="Thickness">
+                                                <On Platform="Android" Value="8,4" />
+                                                <On Platform="UWP" Value="8,8,48,8" />
+                                            </OnPlatform>
+                                        </Setter>
+                                        <Setter
+                                            Property="BackgroundColor"
+                                            Value="Aquamarine"
+                                        />
                                     </MultiTrigger>
                                 </StackLayout.Triggers>
                                 <Label

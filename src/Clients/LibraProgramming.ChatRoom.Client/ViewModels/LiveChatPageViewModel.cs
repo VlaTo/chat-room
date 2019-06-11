@@ -55,20 +55,20 @@ namespace LibraProgramming.ChatRoom.Client.ViewModels
             Messages = new ObservableCollection<ChatMessageViewModel>();
             newMessageRequest = new InteractionRequest<NewMessageContext>();
 
-            /*Messages.Add(new ChatMessageViewModel
+            Messages.Add(new ChatMessageViewModel
             {
                 Author = "User0123",
-                MyMessage = false,
+                IsMyMessage = false,
                 Text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut sagittis urna nisi, eget efficitur ipsum posuere sed.",
                 Created = DateTime.Now - TimeSpan.FromHours(1.0d)
             });
             Messages.Add(new ChatMessageViewModel
             {
                 Author = "User0123",
-                MyMessage = false,
+                IsMyMessage = false,
                 Text = "Nullam tristique urna non tortor iaculis",
                 Created = DateTime.Now - TimeSpan.FromHours(1.5d)
-            });*/
+            });
         }
 
         public override async void OnNavigatedTo(INavigationParameters parameters)
@@ -111,6 +111,7 @@ namespace LibraProgramming.ChatRoom.Client.ViewModels
             var model = new ChatMessageViewModel
             {
                 Author = e.Message.Author,
+                IsMyMessage = IsSameAuthor(e.Message.Author),
                 Text = e.Message.Content,
                 Created = e.Message.Created
             };
