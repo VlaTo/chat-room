@@ -19,9 +19,16 @@ namespace LibraProgramming.ChatRoom.Client.Controls
             set;
         }
 
-        protected TriggerAction(Type constraint)
+        protected BindableObject AttachedObject
         {
-            AttachedObjectTypeConstraint = constraint;
+            get;
+            private set;
+        }
+
+        protected TriggerAction(Type constraint)
+            : base(constraint)
+        {
+            //AttachedObjectTypeConstraint = constraint;
         }
 
         static TriggerAction()
@@ -36,6 +43,9 @@ namespace LibraProgramming.ChatRoom.Client.Controls
 
         public override void AttachTo(BindableObject bindable)
         {
+            AttachedObject = bindable;
+            base.AttachTo(bindable);
+
             /*if (bindable == AttachedObject)
             {
                 return;
@@ -63,6 +73,9 @@ namespace LibraProgramming.ChatRoom.Client.Controls
 
         public override void DetachFrom(BindableObject bindable)
         {
+            AttachedObject = null;
+            base.DetachFrom(bindable);
+
             /*base.Detach();
 
             OnDetaching();
@@ -81,6 +94,5 @@ namespace LibraProgramming.ChatRoom.Client.Controls
         }
 
         protected abstract void Invoke(object value);
-
     }
 }

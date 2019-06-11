@@ -1,5 +1,4 @@
 ﻿using System;
-using System.ComponentModel;
 using Xamarin.Forms;
 
 namespace LibraProgramming.ChatRoom.Client.Controls
@@ -8,13 +7,23 @@ namespace LibraProgramming.ChatRoom.Client.Controls
     public abstract class InteractionRequestTriggerBase : InteractivityBase
     {
         public static readonly BindableProperty ActionsProperty;
+        public static readonly BindableProperty RequestProperty;
 
         public TriggerActionCollection Actions
         {
-            get
-            {
-                return (TriggerActionCollection) GetValue(ActionsProperty);
-            }
+            get => (TriggerActionCollection) GetValue(ActionsProperty);
+        }
+
+        public IInteractionRequest Request
+        {
+            get => (IInteractionRequest) GetValue(RequestProperty);
+            set => SetValue(RequestProperty, value);
+        }
+
+        protected BindableObject AttachedObject
+        {
+            get;
+            private set;
         }
 
         static InteractionRequestTriggerBase()
@@ -22,41 +31,57 @@ namespace LibraProgramming.ChatRoom.Client.Controls
             ActionsProperty = BindableProperty.Create(
                 nameof(Actions),
                 typeof(TriggerActionCollection),
-                typeof(InteractionRequestTriggerBase)
+                typeof(InteractionRequestTriggerBase),
+                defaultValueCreator: _ => new TriggerActionCollection()
+            );
+            RequestProperty = BindableProperty.Create(
+                nameof(Request),
+                typeof(IInteractionRequest),
+                typeof(InteractionRequestTriggerBase),
+                propertyChanged: OnRequestPropertyChanged
             );
         }
 
         internal InteractionRequestTriggerBase(Type constraint)
+            : base(constraint)
         {
-            AttachedObjectTypeConstraint = constraint;
-            
-            var actionCollection = new TriggerActionCollection();
-            
-            SetValue(ActionsProperty, actionCollection);
         }
 
         public override void AttachTo(BindableObject bindable)
         {
-            if (null == bindable)
+            if (null != AttachedObject)
             {
                 throw new InvalidOperationException("Cannot Host Trigger Multiple Times");
             }
 
-            /*if (null != bindable && !AttachedObjectTypeConstraint.GetTypeInfo().IsAssignableFrom(bindable.GetType().GetTypeInfo()))
+            if (null != bindable && false == AttachedObjectTypeConstraint.IsInstanceOfType(bindable))
             {
                 throw new InvalidOperationException("Type Constraint Violated");
             }
 
-            AttachedObject = bindable;*/
+            AttachedObject = bindable;
 
             OnAssociatedObjectChanged();
 
-            //Attach handles the DataContext
             base.AttachTo(bindable);
             
             Actions.AttachTo(bindable);
             
             //OnAttached();
+        }
+
+        public override void DetachFrom(BindableObject bindable)
+        {
+            if (null == AttachedObject)
+            {
+                throw new InvalidOperationException("Cannot Host Trigger Multiple Times");
+            }
+
+            AttachedObject = null;
+
+            base.DetachFrom(bindable);
+
+            Actions.DetachFrom(bindable);
         }
 
         protected void InvokeActions(object parameter)
@@ -79,6 +104,40 @@ namespace LibraProgramming.ChatRoom.Client.Controls
             {
                 trigger.Call(parameter);
             }
+        }
+
+        private void OnRequestChanged(IInteractionRequest oldvalue, IInteractionRequest newvalue)
+        {
+            if (null != oldvalue)
+            {
+                oldvalue.Raised -= OnInteractionRequested;
+            }
+
+            if (null != newvalue)
+            {
+                newvalue.Raised += OnInteractionRequested;
+            }
+        }
+
+        private void OnInteractionRequested(object sender, InteractionRequestedEventArgs e)
+        {
+            try
+            {
+                InvokeActions(e.Context);
+
+            }
+            finally
+            {
+                e.Callback.Invoke();
+            }
+        }
+
+        private static void OnRequestPropertyChanged(BindableObject bindable, object oldvalue, object newvalue)
+        {
+            ((InteractionRequestTriggerBase) bindable).OnRequestChanged(
+                (IInteractionRequest) oldvalue,
+                (IInteractionRequest) newvalue
+            );
         }
     }
 

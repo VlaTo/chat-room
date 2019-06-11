@@ -8,20 +8,24 @@ namespace LibraProgramming.ChatRoom.Client.Controls
         protected virtual Type AttachedObjectTypeConstraint
         {
             get;
-            set;
         }
 
         internal event EventHandler AttachedObjectChanged;
-        
+
+        protected InteractivityBase(Type attachedObjectTypeConstraint)
+        {
+            AttachedObjectTypeConstraint = attachedObjectTypeConstraint;
+        }
+
         public virtual void AttachTo(BindableObject bindable)
         {
             if (null != bindable)
             {
-                //bindable.AddDataContextChangedHandler(BindingContextChanged);
+                bindable.BindingContextChanged += DoBindingContextChanged;
 
                 if (null != bindable.BindingContext)
                 {
-                    DoBindingContextChanged(bindable, EventArgs.Empty);
+                    DoBindingContextChanged(bindable);
                 }
             }
         }
@@ -30,7 +34,7 @@ namespace LibraProgramming.ChatRoom.Client.Controls
         {
             if (null != bindable)
             {
-                //AttachedObject.RemoveDataContextChangedHandler(BindingContextChanged);
+                bindable.BindingContextChanged -= DoBindingContextChanged;
             }
         }
 
@@ -43,26 +47,27 @@ namespace LibraProgramming.ChatRoom.Client.Controls
                 return;
             }
 
-            handler(this, new EventArgs());
+            handler(this, EventArgs.Empty);
+        }
+
+        private void DoBindingContextChanged(BindableObject bindable)
+        {
+            if (null != bindable)
+            {
+                SetBinding(BindingContextProperty,
+                    new Binding
+                    {
+                        Path = nameof(BindingContext),
+                        Source = bindable
+                    });
+
+                OnBindingContextChanged();
+            }
         }
 
         private void DoBindingContextChanged(object sender, EventArgs e)
         {
-            /*var element = sender as FrameworkElement;
-
-            if (null != element)
-            {
-                var dataContext = DataContext;
-
-                SetBinding(DataContextProperty,
-                    new Binding
-                    {
-                        Path = new PropertyPath("DataContext"),
-                        Source = element
-                    });
-
-                OnDataContextChanged(dataContext, DataContext);
-            }*/
+            OnBindingContextChanged();
         }
     }
 }

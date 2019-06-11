@@ -6,6 +6,7 @@ using System.Collections.ObjectModel;
 using System.Security.Claims;
 using System.Security.Principal;
 using System.Threading;
+using LibraProgramming.ChatRoom.Client.Controls;
 using Xamarin.Forms;
 
 namespace LibraProgramming.ChatRoom.Client.ViewModels
@@ -15,6 +16,7 @@ namespace LibraProgramming.ChatRoom.Client.ViewModels
         private readonly IChatRoomService chatService;
         private string description;
         private string message;
+        private InteractionRequest<NewMessageContext> newMessageRequest;
         private IChatChannel channel;
         private IPrincipal author;
 
@@ -40,6 +42,8 @@ namespace LibraProgramming.ChatRoom.Client.ViewModels
             set => SetProperty(ref description, value);
         }
 
+        public IInteractionRequest NewMessageRequest => newMessageRequest;
+
         public LiveChatPageViewModel(
             INavigationService navigationService,
             IChatRoomService chatService)
@@ -49,8 +53,9 @@ namespace LibraProgramming.ChatRoom.Client.ViewModels
 
             SendCommand = new DelegateCommand(OnSendCommand);
             Messages = new ObservableCollection<ChatMessageViewModel>();
+            newMessageRequest = new InteractionRequest<NewMessageContext>();
 
-            Messages.Add(new ChatMessageViewModel
+            /*Messages.Add(new ChatMessageViewModel
             {
                 Author = "User0123",
                 MyMessage = false,
@@ -63,7 +68,7 @@ namespace LibraProgramming.ChatRoom.Client.ViewModels
                 MyMessage = false,
                 Text = "Nullam tristique urna non tortor iaculis",
                 Created = DateTime.Now - TimeSpan.FromHours(1.5d)
-            });
+            });*/
         }
 
         public override async void OnNavigatedTo(INavigationParameters parameters)
@@ -94,25 +99,26 @@ namespace LibraProgramming.ChatRoom.Client.ViewModels
             channel.Dispose();
         }
 
-        private void OnSendCommand()
+        private async void OnSendCommand()
         {
             var message = Message;
             Message = String.Empty;
-            channel.SendAsync(message);
+            await channel.SendAsync(message);
         }
 
         private void OnMessageArrived(object sender, ChatMessageEventArgs e)
         {
-            Device.BeginInvokeOnMainThread(() =>
+            var model = new ChatMessageViewModel
             {
-                Messages.Add(new ChatMessageViewModel
-                {
-                    Author = e.Message.Author,
-                    MyMessage = IsSameAuthor(e.Message.Author),
-                    Text = e.Message.Content,
-                    Created = e.Message.Created
-                });
-            });
+                Author = e.Message.Author,
+                Text = e.Message.Content,
+                Created = e.Message.Created
+            };
+
+            newMessageRequest.Raise(
+                new NewMessageContext(() => Messages.Add(model)),
+                () => { }
+            );
         }
 
         private bool IsSameAuthor(string name)
