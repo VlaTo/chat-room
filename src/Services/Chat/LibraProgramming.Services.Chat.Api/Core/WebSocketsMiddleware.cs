@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 namespace LibraProgramming.ChatRoom.Services.Chat.Api.Core
@@ -16,6 +17,7 @@ namespace LibraProgramming.ChatRoom.Services.Chat.Api.Core
     {
         private readonly RequestDelegate next;
         private readonly WebSocketHandlerResolver resolver;
+        private readonly CancellationToken shutdown;
         private readonly ILogger logger;
 
         /// <summary>
@@ -23,15 +25,18 @@ namespace LibraProgramming.ChatRoom.Services.Chat.Api.Core
         /// </summary>
         /// <param name="next"></param>
         /// <param name="resolver"></param>
+        /// <param name="applicationLifetime"></param>
         /// <param name="logger"></param>
         public WebSocketsMiddleware(
             RequestDelegate next, 
-            WebSocketHandlerResolver resolver, 
+            WebSocketHandlerResolver resolver,
+            IHostApplicationLifetime applicationLifetime,
             ILogger<WebSocketsMiddleware> logger)
         {
             this.next = next;
             this.resolver = resolver;
             this.logger = logger;
+            shutdown = applicationLifetime.ApplicationStopping;
         }
 
         /// <summary>
@@ -60,7 +65,9 @@ namespace LibraProgramming.ChatRoom.Services.Chat.Api.Core
 
             try
             {
-                await ReceiveAsync(socket, context.RequestAborted, async (message, result) =>
+                var cancel = CancellationTokenSource.CreateLinkedTokenSource(shutdown, context.RequestAborted);
+
+                await ReceiveAsync(socket, cancel.Token, async (message, result) =>
                 {
                     switch (result.MessageType)
                     {
@@ -91,7 +98,7 @@ namespace LibraProgramming.ChatRoom.Services.Chat.Api.Core
             }
         }
 
-        private static async Task ReceiveAsync(WebSocket socket, CancellationToken ct, Func<ArraySegment<byte>, WebSocketReceiveResult, Task> handler)
+        private static async Task ReceiveAsync(WebSocket socket, CancellationToken cancellationToken, Func<ArraySegment<byte>, WebSocketReceiveResult, Task> handler)
         {
             while (WebSocketState.Open == socket.State)
             {
@@ -104,12 +111,12 @@ namespace LibraProgramming.ChatRoom.Services.Chat.Api.Core
 
                     do
                     {
-                        result = await socket.ReceiveAsync(buffer, ct);
-                        await stream.WriteAsync(buffer.Array, buffer.Offset, result.Count, ct);
+                        result = await socket.ReceiveAsync(buffer, cancellationToken);
+                        await stream.WriteAsync(buffer.Array, buffer.Offset, result.Count, cancellationToken);
                     }
                     while (false == result.EndOfMessage);
 
-                    ct.ThrowIfCancellationRequested();
+                    cancellationToken.ThrowIfCancellationRequested();
 
                     message = new ArraySegment<byte>(stream.ToArray());
                 }

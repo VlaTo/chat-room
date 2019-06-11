@@ -3,6 +3,8 @@
     xmlns="http://xamarin.com/schemas/2014/forms"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:prism="clr-namespace:Prism.Mvvm;assembly=Prism.Forms"
+    xmlns:ctrl="clr-namespace:LibraProgramming.ChatRoom.Client.Controls;assembly=LibraProgramming.ChatRoom.Client"
+    xmlns:vm="clr-namespace:LibraProgramming.ChatRoom.Client.ViewModels;assembly=LibraProgramming.ChatRoom.Client"
     x:Class="LibraProgramming.ChatRoom.Client.Views.LiveChatPage"
     prism:ViewModelLocator.AutowireViewModel="True"
     NavigationPage.HasNavigationBar="True"
@@ -15,6 +17,15 @@
             <On Platform="UWP" Value="" />
         </OnPlatform>
     </NavigationPage.TitleIcon>
+    <ctrl:Interactivity.Requests>
+        <ctrl:InteractionRequestTrigger
+            x:TypeArguments="vm:NewMessageContext"
+            Request="{Binding Path=NewMessageRequest, Mode=OneTime}">
+            <ctrl:CallMethodAction
+                MethodName="OnNewMessageInteractionRequested"
+            />
+        </ctrl:InteractionRequestTrigger>
+    </ctrl:Interactivity.Requests>
     <ContentPage.Content>
         <Grid>
             <Grid.RowDefinitions>
