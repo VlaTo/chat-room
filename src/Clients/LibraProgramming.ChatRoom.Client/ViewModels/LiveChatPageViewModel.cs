@@ -6,6 +6,7 @@ using System.Collections.ObjectModel;
 using System.Security.Claims;
 using System.Security.Principal;
 using System.Threading;
+using Xamarin.Forms;
 
 namespace LibraProgramming.ChatRoom.Client.ViewModels
 {
@@ -52,12 +53,14 @@ namespace LibraProgramming.ChatRoom.Client.ViewModels
             Messages.Add(new ChatMessageViewModel
             {
                 Author = "User0123",
+                MyMessage = false,
                 Text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut sagittis urna nisi, eget efficitur ipsum posuere sed.",
                 Created = DateTime.Now - TimeSpan.FromHours(1.0d)
             });
             Messages.Add(new ChatMessageViewModel
             {
                 Author = "User0123",
+                MyMessage = false,
                 Text = "Nullam tristique urna non tortor iaculis",
                 Created = DateTime.Now - TimeSpan.FromHours(1.5d)
             });
@@ -100,14 +103,22 @@ namespace LibraProgramming.ChatRoom.Client.ViewModels
 
         private void OnMessageArrived(object sender, ChatMessageEventArgs e)
         {
-            //Debug.WriteLine($"[LiveChatPageViewModel.OnMessageArrived] {e.Message.Content}");
-
-            Messages.Add(new ChatMessageViewModel
+            Device.BeginInvokeOnMainThread(() =>
             {
-                Author = e.Message.Author,
-                Text = e.Message.Content,
-                Created = e.Message.Created
+                Messages.Add(new ChatMessageViewModel
+                {
+                    Author = e.Message.Author,
+                    MyMessage = IsSameAuthor(e.Message.Author),
+                    Text = e.Message.Content,
+                    Created = e.Message.Created
+                });
             });
+        }
+
+        private bool IsSameAuthor(string name)
+        {
+            var currentName = author.Identity.Name;
+            return String.Equals(currentName, name, StringComparison.OrdinalIgnoreCase);
         }
     }
 }

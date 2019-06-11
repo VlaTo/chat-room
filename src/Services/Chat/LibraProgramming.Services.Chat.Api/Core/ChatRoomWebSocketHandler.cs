@@ -9,6 +9,7 @@ using Orleans.Streams;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
@@ -22,8 +23,6 @@ namespace LibraProgramming.ChatRoom.Services.Chat.Api.Core
         private readonly IChatRoomRegistry registry;
         private readonly ILogger<ChatRoomWebSocketHandler> logger;
         private readonly Encoding encoding;
-        //private readonly DataContractHessianSerializer incomingSerializer;
-        //private readonly DataContractHessianSerializer outgoingSerializer;
         private HessianSerializerSettings settings;
         private IAsyncStream<ChatMessage> stream;
         private StreamSubscriptionHandle<ChatMessage> subscription;
@@ -39,9 +38,6 @@ namespace LibraProgramming.ChatRoom.Services.Chat.Api.Core
             settings = new HessianSerializerSettings
             {
             };
-
-            //incomingSerializer = new DataContractHessianSerializer(typeof(IncomingChatMessage), settings);
-            //outgoingSerializer = new DataContractHessianSerializer(typeof(OutgoingChatMessage), settings);
         }
 
         public override async Task OnConnectAsync(WebSocket webSocket, RouteValueDictionary values)
@@ -79,9 +75,6 @@ namespace LibraProgramming.ChatRoom.Services.Chat.Api.Core
                 return Task.CompletedTask;
             }
 
-            //logger.LogDebug($"[ChatRoomWebSocketHandler.OnMessageAsync] Received packet, size: {data.Count} bytes");
-            //MessageDebug.DebugWriteArray(logger, data.Array);
-
             IncomingChatMessage message;
 
             using (var memoryStream = new MemoryStream(data.Array))
@@ -89,8 +82,6 @@ namespace LibraProgramming.ChatRoom.Services.Chat.Api.Core
                 var serializer = new DataContractHessianSerializer(typeof(IncomingChatMessage), settings);
                 message = (IncomingChatMessage) serializer.ReadObject(memoryStream);
             }
-
-            logger.LogDebug($"[ChatRoomWebSocketHandler.OnMessageAsync] Author: \"{message.Author}\"; Content: \"{message.Content}\"");
 
             return stream.OnNextAsync(new ChatMessage
             {
@@ -109,8 +100,6 @@ namespace LibraProgramming.ChatRoom.Services.Chat.Api.Core
         private Task OnStreamMessage(ChatMessage message, StreamSequenceToken sst)
         {
             ArraySegment<byte> data;
-            var tasks = new List<Task>();
-            var sockets = registry[roomId];
 
             using (var memoryStream = new MemoryStream())
             {
@@ -126,12 +115,24 @@ namespace LibraProgramming.ChatRoom.Services.Chat.Api.Core
                 data = new ArraySegment<byte>(memoryStream.ToArray());
             }
 
-            foreach (var webSocket in sockets)
+            var tasks = new List<Task>();
+            var registeredSockets = registry[roomId];
+            var sockets = registeredSockets.ToArray();
+
+            sockets.AsParallel().ForAll(socket =>
             {
-                logger.LogDebug($"[ChatRoomWebSocketHandler.OnStreamMessage] Sending to socket: {webSocket}, data length: {data.Count}");
-                var task = webSocket.SendAsync(data, WebSocketMessageType.Binary, true, CancellationToken.None);
-                tasks.Add(task);
-            }
+                try
+                {
+                    logger.LogDebug($"[ChatRoomWebSocketHandler.OnStreamMessage] Sending data length: {data.Count}");
+                    var task = socket.SendAsync(data, WebSocketMessageType.Binary, true, CancellationToken.None);
+                    tasks.Add(task);
+                }
+                catch (WebSocketException exception)
+                {
+                    Console.WriteLine(exception);
+                    registeredSockets.Remove(socket);
+                }
+            });
 
             return Task.WhenAll(tasks);
         }

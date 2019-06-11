@@ -7,7 +7,14 @@ namespace LibraProgramming.ChatRoom.Client.ViewModels
     {
         private string author;
         private string text;
+        private bool myMessage;
         private DateTime created;
+
+        public bool MyMessage
+        {
+            get => myMessage;
+            set => SetProperty(ref myMessage, value);
+        }
 
         public string Author
         {
