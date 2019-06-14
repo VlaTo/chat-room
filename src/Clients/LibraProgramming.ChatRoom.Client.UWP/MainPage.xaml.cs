@@ -5,6 +5,7 @@ using Prism;
 using Prism.Ioc;
 using Prism.Navigation;
 using Prism.Unity;
+using Unity;
 using Xamarin.Forms;
 
 namespace LibraProgramming.ChatRoom.Client.UWP

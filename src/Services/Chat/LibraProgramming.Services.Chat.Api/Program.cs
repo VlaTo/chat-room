@@ -17,6 +17,7 @@ using Orleans;
 using Orleans.Configuration;
 using Orleans.Hosting;
 using System;
+using LibraProgramming.ChatRoom.Domain.Models;
 
 namespace LibraProgramming.ChatRoom.Services.Chat.Api
 {
@@ -102,6 +103,21 @@ namespace LibraProgramming.ChatRoom.Services.Chat.Api
 
                                 options
                                     .CreateMap<RoomDescription, RoomResult>()
+                                    .ForMember(
+                                        result => result.Id,
+                                        map => map.MapFrom(source => source.Id)
+                                    )
+                                    .ForMember(
+                                        result => result.Name,
+                                        map => map.MapFrom(source => source.Name)
+                                    )
+                                    .ForMember(
+                                        result => result.Description,
+                                        map => map.MapFrom(source => source.Description)
+                                    );
+
+                                options
+                                    .CreateMap<RoomDescription, RoomDetails>()
                                     .ForMember(
                                         result => result.Id,
                                         map => map.MapFrom(source => source.Id)
