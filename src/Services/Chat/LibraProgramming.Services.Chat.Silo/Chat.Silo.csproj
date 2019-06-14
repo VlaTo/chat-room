@@ -11,7 +11,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="3.0.0-preview6.19304.6" />
-    <PackageReference Include="Microsoft.Orleans.Server" Version="2.3.4" />
+    <PackageReference Include="Microsoft.Orleans.Server" Version="2.3.5" />
     <PackageReference Include="Orleans.Providers.MongoDB" Version="2.4.0" />
   </ItemGroup>
 

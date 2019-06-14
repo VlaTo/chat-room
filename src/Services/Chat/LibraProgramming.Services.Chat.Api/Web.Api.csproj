@@ -14,7 +14,7 @@
     <PackageReference Include="MediatR" Version="7.0.0" />
     <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="7.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="3.0.0-preview6.19304.6" />
-    <PackageReference Include="Microsoft.Orleans.Client" Version="2.3.4" />
+    <PackageReference Include="Microsoft.Orleans.Client" Version="2.3.5" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.0.0-preview5-19264-04" />
   </ItemGroup>
 
