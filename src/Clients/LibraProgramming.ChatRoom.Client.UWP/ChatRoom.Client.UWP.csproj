@@ -132,14 +132,14 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Logging">
-      <Version>3.0.0-preview5.19227.9</Version>
+      <Version>3.0.0-preview6.19304.6</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Logging.Debug">
-      <Version>3.0.0-preview5.19227.9</Version>
+      <Version>3.0.0-preview6.19304.6</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform" Version="6.2.8" />
-    <PackageReference Include="Xamarin.Forms" Version="4.0.0.425677" />
-    <PackageReference Include="Prism.Unity.Forms" Version="7.2.0.1233-pre" />
+    <PackageReference Include="Xamarin.Forms" Version="4.1.0.496342-pre2" />
+    <PackageReference Include="Prism.Unity.Forms" Version="7.2.0.1347-pre" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ChatRoom.Client.UWP_TemporaryKey.pfx" />

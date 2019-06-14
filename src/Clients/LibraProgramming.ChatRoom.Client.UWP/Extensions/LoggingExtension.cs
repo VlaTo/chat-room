@@ -1,9 +1,7 @@
 ﻿using System.Security;
 using Microsoft.Extensions.Logging;
 using Unity;
-using Unity.Attributes;
 using Unity.Extension;
-using Unity.Policy;
 
 namespace LibraProgramming.ChatRoom.Client.UWP.Extensions
 {
@@ -33,9 +31,9 @@ namespace LibraProgramming.ChatRoom.Client.UWP.Extensions
             //Context.Policies.Set(new TPolicyInterface ,typeof(ILogger));
         }
 
-        private class Test : IBuilderPolicy
+        /*private class Test : IBuilderPolicy
         {
 
-        }
+        }*/
     }
 }
