@@ -19,12 +19,14 @@ namespace LibraProgramming.ChatRoom.Client.ViewModels
     public class LiveChatPageViewModel : PageViewModelBase
     {
         private readonly IChatRoomService chatService;
+        private readonly IUserInformation userInformation;
         private readonly ChatDbContext context;
+        private readonly InteractionRequest<NewMessageContext> newMessageRequest;
         private string description;
-        private string message;
-        private InteractionRequest<NewMessageContext> newMessageRequest;
+        private string text;
         private IChatChannel channel;
         private IPrincipal author;
+        private long roomId;
 
         public ObservableCollection<ChatMessageViewModel> Messages
         {
@@ -38,8 +40,8 @@ namespace LibraProgramming.ChatRoom.Client.ViewModels
 
         public string Message
         {
-            get => message;
-            set => SetProperty(ref message, value);
+            get => text;
+            set => SetProperty(ref text, value);
         }
 
         public string Description
@@ -53,17 +55,19 @@ namespace LibraProgramming.ChatRoom.Client.ViewModels
         public LiveChatPageViewModel(
             INavigationService navigationService,
             IChatRoomService chatService,
+            IUserInformation userInformation,
             ChatDbContext context)
             : base(navigationService)
         {
             this.chatService = chatService;
+            this.userInformation = userInformation;
             this.context = context;
 
             SendCommand = new DelegateCommand(OnSendCommand);
             Messages = new ObservableCollection<ChatMessageViewModel>();
             newMessageRequest = new InteractionRequest<NewMessageContext>();
 
-            Messages.Add(new ChatMessageViewModel
+            /*Messages.Add(new ChatMessageViewModel
             {
                 Author = "User0123",
                 IsMyMessage = false,
@@ -76,17 +80,17 @@ namespace LibraProgramming.ChatRoom.Client.ViewModels
                 IsMyMessage = false,
                 Text = "Nullam tristique urna non tortor iaculis",
                 Created = DateTime.Now - TimeSpan.FromHours(1.5d)
-            });
+            });*/
         }
 
         public override async void OnNavigatedTo(INavigationParameters parameters)
         {
-            var id = parameters.GetValue<long>("room");
-            var room = await context.Rooms.FirstOrDefaultAsync(entity => entity.Id == id);
+            roomId = parameters.GetValue<long>("room");
+            var room = await context.Rooms.FirstOrDefaultAsync(entity => entity.Id == roomId);
 
             if (null == room)
             {
-                var chatRoom = await chatService.GetRoomAsync(id);
+                var chatRoom = await chatService.GetRoomAsync(roomId);
                 room = new Room
                 {
                     Title = chatRoom.Title,
@@ -95,25 +99,17 @@ namespace LibraProgramming.ChatRoom.Client.ViewModels
                 };
 
                 await context.Rooms.AddAsync(room);
+                await context.SaveChangesAsync();
             }
 
-            /*var room = await chatService.GetRoomAsync(id);
-
-            if (null == room)
-            {
-                return;
-            }
-
-            Title = room.Title;
-            Description = room.Description;*/
-
+            var username = await userInformation.GetUserNameAsync();
             author = new GenericPrincipal(
-                new GenericIdentity($"User{(ushort) DateTime.Now.Ticks}", ClaimsIdentity.DefaultNameClaimType),
+                new GenericIdentity(username, ClaimsIdentity.DefaultNameClaimType),
                 new[] {"Author"}
             );
 
             var messages = await context.Messages
-                .Where(entity => entity.RoomId == id)
+                .Where(entity => entity.RoomId == roomId)
                 .OrderBy(entity => entity.Id)
                 .ToArrayAsync();
 
@@ -127,7 +123,7 @@ namespace LibraProgramming.ChatRoom.Client.ViewModels
                 });
             }
 
-            channel = await chatService.OpenChatAsync(id, author, CancellationToken.None);
+            channel = await chatService.OpenChatAsync(roomId, author, CancellationToken.None);
             channel.MessageArrived += OnMessageArrived;
         }
 
@@ -144,14 +140,26 @@ namespace LibraProgramming.ChatRoom.Client.ViewModels
             await channel.SendAsync(message);
         }
 
-        private void OnMessageArrived(object sender, ChatMessageEventArgs e)
+        private async void OnMessageArrived(object sender, ChatMessageEventArgs e)
         {
+            var message = e.Message;
+
+            context.Messages.Add(new Message
+            {
+                Author = message.Author,
+                Text = message.Content,
+                Created = message.Created,
+                RoomId = roomId
+            });
+
+            await context.SaveChangesAsync();
+
             var model = new ChatMessageViewModel
             {
-                Author = e.Message.Author,
-                IsMyMessage = IsSameAuthor(e.Message.Author),
-                Text = e.Message.Content,
-                Created = e.Message.Created
+                Author = message.Author,
+                IsMyMessage = IsSameAuthor(message.Author),
+                Text = message.Content,
+                Created = message.Created
             };
 
             newMessageRequest.Raise(

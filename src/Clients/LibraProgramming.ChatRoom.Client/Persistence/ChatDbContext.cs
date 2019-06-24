@@ -40,7 +40,7 @@ namespace LibraProgramming.ChatRoom.Client.Persistence
                         filename
                     );
 
-                        break;
+                    break;
                 }
 
                 case Device.UWP:
