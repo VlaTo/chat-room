@@ -1,6 +1,8 @@
-﻿using LibraProgramming.ChatRoom.Client.Services;
+﻿using LibraProgramming.ChatRoom.Client.Persistence;
+using LibraProgramming.ChatRoom.Client.Services;
 using LibraProgramming.ChatRoom.Client.ViewModels;
 using LibraProgramming.ChatRoom.Client.Views;
+using Microsoft.EntityFrameworkCore;
 using Prism;
 using Prism.Ioc;
 using Xamarin.Forms;
@@ -30,6 +32,11 @@ namespace LibraProgramming.ChatRoom.Client
         {
             InitializeComponent();
 
+            var dbContext = Container.Resolve<ChatDatabaseContext>();
+
+            await dbContext.Database.EnsureCreatedAsync();
+            await dbContext.Database.MigrateAsync();
+
             var result = await NavigationService.NavigateAsync($"{nameof(NavigationPage)}/{nameof(Views.MainPage)}");
 
             if (false == result.Success)
@@ -41,6 +48,9 @@ namespace LibraProgramming.ChatRoom.Client
         protected override void RegisterTypes(IContainerRegistry container)
         {
             container.Register<IChatRoomService, ChatRoomService>();
+            container.RegisterSingleton<ChatDatabaseContext>();
+            container.RegisterSingleton<IMessageService, MessageService>();
+
             //container.RegisterForNavigation<PrismNavigationPage>(nameof(PrismNavigationPage));
             container.RegisterForNavigation<NavigationPage>(nameof(NavigationPage));
             container.RegisterForNavigation<MainPage, MainPageViewModel>(nameof(Views.MainPage));

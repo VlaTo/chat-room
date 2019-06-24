@@ -7,6 +7,7 @@ using System.Security.Claims;
 using System.Security.Principal;
 using System.Threading;
 using LibraProgramming.ChatRoom.Client.Controls;
+using LibraProgramming.ChatRoom.Client.Models.Database;
 using Xamarin.Forms;
 
 namespace LibraProgramming.ChatRoom.Client.ViewModels
@@ -14,6 +15,7 @@ namespace LibraProgramming.ChatRoom.Client.ViewModels
     public class LiveChatPageViewModel : PageViewModelBase
     {
         private readonly IChatRoomService chatService;
+        private readonly IMessageService messageService;
         private string description;
         private string message;
         private InteractionRequest<NewMessageContext> newMessageRequest;
@@ -46,29 +48,16 @@ namespace LibraProgramming.ChatRoom.Client.ViewModels
 
         public LiveChatPageViewModel(
             INavigationService navigationService,
-            IChatRoomService chatService)
+            IChatRoomService chatService,
+            IMessageService messageService)
             : base(navigationService)
         {
             this.chatService = chatService;
+            this.messageService = messageService;
 
             SendCommand = new DelegateCommand(OnSendCommand);
             Messages = new ObservableCollection<ChatMessageViewModel>();
             newMessageRequest = new InteractionRequest<NewMessageContext>();
-
-            Messages.Add(new ChatMessageViewModel
-            {
-                Author = "User0123",
-                IsMyMessage = false,
-                Text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut sagittis urna nisi, eget efficitur ipsum posuere sed.",
-                Created = DateTime.Now - TimeSpan.FromHours(1.0d)
-            });
-            Messages.Add(new ChatMessageViewModel
-            {
-                Author = "User0123",
-                IsMyMessage = false,
-                Text = "Nullam tristique urna non tortor iaculis",
-                Created = DateTime.Now - TimeSpan.FromHours(1.5d)
-            });
         }
 
         public override async void OnNavigatedTo(INavigationParameters parameters)
@@ -91,6 +80,17 @@ namespace LibraProgramming.ChatRoom.Client.ViewModels
 
             channel = await chatService.OpenChatAsync(id, author, CancellationToken.None);
             channel.MessageArrived += OnMessageArrived;
+
+            foreach (var message in messageService.GetMessages())
+            {
+                Messages.Add(new ChatMessageViewModel
+                {
+                    Author = message.Author,
+                    IsMyMessage = IsSameAuthor(message.Author),
+                    Text = message.Content,
+                    Created = message.Created
+                });
+            }
         }
 
         public override void OnNavigatedFrom(INavigationParameters parameters)
@@ -108,6 +108,13 @@ namespace LibraProgramming.ChatRoom.Client.ViewModels
 
         private void OnMessageArrived(object sender, ChatMessageEventArgs e)
         {
+            messageService.Save(new Message
+            {
+                Author = e.Message.Author,
+                Content = e.Message.Content,
+                Created = e.Message.Created
+            });
+
             var model = new ChatMessageViewModel
             {
                 Author = e.Message.Author,
