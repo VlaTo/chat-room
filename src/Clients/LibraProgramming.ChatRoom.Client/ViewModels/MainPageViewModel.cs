@@ -98,7 +98,7 @@ namespace LibraProgramming.ChatRoom.Client.ViewModels
         private async void OnAddRoomCommand()
         {
             var result = await NavigationService.NavigateAsync(
-                $"{nameof(NavigationPage)}/{nameof(AddNewRoomPage)}",
+                $"{nameof(AddNewRoomPage)}",
                 parameters: new NavigationParameters
                 {
                     {"link", true}
@@ -111,20 +111,12 @@ namespace LibraProgramming.ChatRoom.Client.ViewModels
             {
                 throw result.Exception;
             }
-
-            /*addNewRoomRequest.Raise(new AddNewRoomRequestContext(), () =>
-            {
-
-            });*/
-
         }
 
         private async void OnNavigateCommand(ChatRoomViewModel room)
         {
-            //var navigationUrl = $"{nameof(NavigationPage)}/{nameof(LiveChatPage)}";
-            //var navigationUrl = $"{nameof(LiveChatPage)}";
             var result = await NavigationService.NavigateAsync(
-                $"{nameof(NavigationPage)}/{nameof(LiveChatPage)}",
+                $"{nameof(LiveChatPage)}",
                 new NavigationParameters
                 {
                     {"room", room.Id}
