@@ -1,13 +1,14 @@
 ﻿using AutoMapper;
+using Blueshift.EntityFrameworkCore.MongoDB.Infrastructure;
 using IdentityServer4.Configuration;
 using LibraProgramming.ChatRoom.Domain.Models;
 using LibraProgramming.ChatRoom.Domain.Results;
 using LibraProgramming.ChatRoom.Services.Chat.Api.Core;
 using LibraProgramming.ChatRoom.Services.Chat.Api.Core.Models;
 using LibraProgramming.ChatRoom.Services.Chat.Api.Extensions;
+using LibraProgramming.ChatRoom.Services.Chat.Persistence;
+using LibraProgramming.ChatRoom.Services.Chat.Persistence.Models;
 using LibraProgramming.Services.Chat.Contracts;
-using LibraProgramming.Services.Chat.Persistence;
-using LibraProgramming.Services.Chat.Persistence.Models;
 using MediatR;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Builder;
@@ -23,7 +24,6 @@ using Orleans;
 using Orleans.Configuration;
 using Orleans.Hosting;
 using System;
-using Blueshift.EntityFrameworkCore.MongoDB.Infrastructure;
 
 namespace LibraProgramming.ChatRoom.Services.Chat.Api
 {
@@ -117,12 +117,12 @@ namespace LibraProgramming.ChatRoom.Services.Chat.Api
                             options.Events.RaiseErrorEvents = true;
                             options.Events.RaiseSuccessEvents = true;
 
-                            options.UserInteraction.LoginUrl = "";
-                            options.UserInteraction.ConsentUrl = "";
-                            options.UserInteraction.ErrorUrl = "";
+                            options.UserInteraction.LoginUrl = "/Account/SignIn";
+                            options.UserInteraction.ConsentUrl = "Consent/Confirm";
+                            options.UserInteraction.ErrorUrl = "/Account/Error";
                         })
                         // https://github.com/IdentityServer/IdentityServer4/blob/44651bea9b02c992902639b21205f433aad47d03/src/IdentityServer4/src/Configuration/DependencyInjection/BuilderExtensions/Crypto.cs
-                        //.AddDeveloperSigningCredential()
+                        .AddSigninCredentials(context.Configuration.GetSection("IdentityServer:Key"))
                         .AddAspNetIdentity<Customer>()
                         .AddConfigurationStore(options =>
                         {
@@ -188,7 +188,10 @@ namespace LibraProgramming.ChatRoom.Services.Chat.Api
                                         map => map.MapFrom(source => source.Description)
                                     );
                             },
-                            AppDomain.CurrentDomain.GetAssemblies())
+                            typeof(Program).Assembly
+                        );
+
+                    services
                         .AddMediatR(
                             typeof(Program).Assembly
                         );
@@ -240,6 +243,8 @@ namespace LibraProgramming.ChatRoom.Services.Chat.Api
                             ReceiveBufferSize = 8096
                         })
                         .UseMiddleware<WebSocketsMiddleware>()
+                        .UseAuthentication()
+                        .UseIdentityServer()
                         .UseRouting()
                         .UseEndpoints(routes =>
                         {

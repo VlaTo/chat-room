@@ -37,7 +37,8 @@ namespace LibraProgramming.ChatRoom.Client
             await context.Database.EnsureCreatedAsync();
             await context.Database.MigrateAsync();
 
-            var result = await NavigationService.NavigateAsync($"{nameof(NavigationPage)}/{nameof(Views.MainPage)}");
+            //var result = await NavigationService.NavigateAsync($"{nameof(NavigationPage)}/{nameof(Views.MainPage)}");
+            var result = await NavigationService.NavigateAsync("nav/signin");
 
             if (false == result.Success)
             {
@@ -47,11 +48,13 @@ namespace LibraProgramming.ChatRoom.Client
 
         protected override void RegisterTypes(IContainerRegistry container)
         {
+            container.Register<IApiClient, HttpApiClient>();
             container.Register<IChatRoomService, ChatRoomService>();
             container.RegisterSingleton<ChatDbContext>();
 
             //container.RegisterForNavigation<PrismNavigationPage>(nameof(PrismNavigationPage));
-            container.RegisterForNavigation<NavigationPage>(nameof(NavigationPage));
+            container.RegisterForNavigation<NavigationPage>("nav");
+            container.RegisterForNavigation<SignInPage, SignInPageViewModel>("signin");
             container.RegisterForNavigation<MainPage, MainPageViewModel>(nameof(Views.MainPage));
             container.RegisterForNavigation<LiveChatPage, LiveChatPageViewModel>(nameof(LiveChatPage));
             container.RegisterForNavigation<AddNewRoomPage, AddNewRoomViewModel>(nameof(AddNewRoomPage));

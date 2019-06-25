@@ -2,8 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.0</TargetFramework>
-    <AssemblyName>LibraProgramming.Services.Chat.Persistence</AssemblyName>
-    <RootNamespace>LibraProgramming.Services.Chat.Persistence</RootNamespace>
+    <AssemblyName>LibraProgramming.ChatRoom.Services.Chat.Persistence</AssemblyName>
+    <RootNamespace>LibraProgramming.ChatRoom.Services.Chat.Persistence</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

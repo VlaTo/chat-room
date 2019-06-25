@@ -23,22 +23,12 @@ namespace LibraProgramming.ChatRoom.Client.Services
     /// </summary>
     public sealed class ChatRoomService : IChatRoomService
     {
-        private readonly Uri serverRootUri;
+        private readonly IApiClient apiClient;
 
         [InjectionConstructor]
-        public ChatRoomService()
-            : this(new Uri("http://localhost:5000" /* place your local IP web api here, for example 'http://192.168.0.0:5000'*/))
+        public ChatRoomService(IApiClient apiClient)
         {
-        }
-
-        private ChatRoomService(Uri serverRootUri)
-        {
-            if (null == serverRootUri)
-            {
-                throw new ArgumentNullException(nameof(serverRootUri));
-            }
-
-            this.serverRootUri = serverRootUri;
+            this.apiClient = apiClient;
         }
 
         /// <summary>
@@ -47,47 +37,11 @@ namespace LibraProgramming.ChatRoom.Client.Services
         /// <returns></returns>
         public async Task<IReadOnlyList<Models.ChatRoom>> GetRoomsAsync()
         {
-            try
-            {
-                var path = new Uri(serverRootUri, "/api/rooms");
-                var request = WebRequest.Create(path);
-
-                request.Method = WebRequestMethods.Http.Get;
-
-                using (var response = await request.GetResponseAsync())
-                {
-                    var http = (HttpWebResponse) response;
-
-                    if (HttpStatusCode.OK != http.StatusCode)
-                    {
-                        return null;
-                    }
-
-                    var list = new List<Models.ChatRoom>();
-
-                    using (var reader = new JsonTextReader(response.GetResponseReader()))
-                    {
-                        var serializer = new JsonSerializer();
-                        var result = serializer.Deserialize<RoomsResult>(reader);
-
-                        if (null != result)
-                        {
-                            var rooms = result.Rooms.Select(
-                                room => new Models.ChatRoom(room.Id, room.Name, room.Description)
-                            );
-
-                            list.AddRange(rooms);
-                        }
-                    }
-
-                    return new ReadOnlyCollection<Models.ChatRoom>(list);
-                }
-            }
-            catch (Exception e)
-            {
-                Debug.WriteLine(e);
-                return null;
-            }
+            var result = await apiClient.GetAsync<RoomsResult>(new Uri("/api/rooms", UriKind.Relative));
+            var rooms = result.Rooms.Select(
+                room => new Models.ChatRoom(room.Id, room.Name, room.Description)
+            );
+            return rooms.ToList().AsReadOnly();
         }
 
         /// <summary>
@@ -98,7 +52,9 @@ namespace LibraProgramming.ChatRoom.Client.Services
         /// <returns></returns>
         public async Task<Models.ChatRoom> GetRoomAsync(long roomId)
         {
-            try
+            throw new NotImplementedException();
+
+            /*try
             {
                 var path = new Uri(serverRootUri, $"/api/room/{roomId}");
                 var request = WebRequest.Create(path);
@@ -130,7 +86,7 @@ namespace LibraProgramming.ChatRoom.Client.Services
             {
                 Debug.WriteLine(e);
                 return null;
-            }
+            }*/
         }
 
         /// <summary>
@@ -139,7 +95,9 @@ namespace LibraProgramming.ChatRoom.Client.Services
         /// <returns></returns>
         public async Task<Models.ChatRoom> CreateRoomAsync(string name, string description)
         {
-            try
+            throw new NotImplementedException();
+
+            /*try
             {
                 var path = new Uri(serverRootUri, $"/api/rooms");
                 var request = (HttpWebRequest) WebRequest.Create(path);
@@ -179,7 +137,7 @@ namespace LibraProgramming.ChatRoom.Client.Services
             {
                 Debug.WriteLine(e);
                 return null;
-            }
+            }*/
         }
 
         /// <summary>
@@ -188,7 +146,9 @@ namespace LibraProgramming.ChatRoom.Client.Services
         /// <returns></returns>
         public async Task SaveRoomAsync(long roomId, string name, string description)
         {
-            try
+            throw new NotImplementedException();
+
+            /*try
             {
                 var path = new Uri(serverRootUri, $"/api/room/{roomId}");
                 var request = (HttpWebRequest) WebRequest.Create(path);
@@ -220,7 +180,7 @@ namespace LibraProgramming.ChatRoom.Client.Services
             {
                 Debug.WriteLine(e);
                 throw ;
-            }
+            }*/
         }
 
         /// <summary>
@@ -232,7 +192,9 @@ namespace LibraProgramming.ChatRoom.Client.Services
         /// <returns></returns>
         public async Task<IChatChannel> OpenChatAsync(long roomId, IPrincipal principal, CancellationToken ct)
         {
-            var socket = new ClientWebSocket();
+            throw new NotImplementedException();
+
+            /*var socket = new ClientWebSocket();
             var path = new UriBuilder(new Uri(serverRootUri, $"/api/chat/{roomId}"))
             {
                 Scheme = "ws"
@@ -245,7 +207,7 @@ namespace LibraProgramming.ChatRoom.Client.Services
 
             channel.StartReceive();
 
-            return channel;
+            return channel;*/
         }
 
         /// <summary>
