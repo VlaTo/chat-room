@@ -2,7 +2,7 @@
 
 namespace LibraProgramming.ChatRoom.Services.Chat.Persistence.Models
 {
-    public class Customer : IdentityUser
+    public class Customer : IdentityUser<long>
     {
     }
 }

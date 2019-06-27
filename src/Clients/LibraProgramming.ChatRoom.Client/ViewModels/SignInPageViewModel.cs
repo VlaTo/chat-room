@@ -1,7 +1,12 @@
-﻿using IdentityModel.OidcClient;
+﻿using System;
+using System.Diagnostics;
+using System.Net.Http;
+using IdentityModel.OidcClient;
 using IdentityModel.OidcClient.Browser;
 using LibraProgramming.ChatRoom.Client.Services;
+using Prism.Commands;
 using Prism.Navigation;
+using Xamarin.Essentials;
 
 namespace LibraProgramming.ChatRoom.Client.ViewModels
 {
@@ -12,6 +17,11 @@ namespace LibraProgramming.ChatRoom.Client.ViewModels
         private readonly IApiClient apiClient;
         private readonly OidcClientOptions options;
         private readonly OidcClient client;
+
+        public DelegateCommand SignIn
+        {
+            get;
+        }
 
         public SignInPageViewModel(
             INavigationService navigationService,
@@ -25,16 +35,29 @@ namespace LibraProgramming.ChatRoom.Client.ViewModels
                 Authority = GlobalSettings.Instance.BaseIdentityHostPath.ToString(),
                 ClientId = GlobalSettings.Instance.ClientId,
                 ClientSecret = GlobalSettings.Instance.ClientSecret,
-                Scope = "openid profile email api offline_access",
+                Scope = "openid profile chat.api offline_access",
                 RedirectUri = GlobalSettings.Instance.Callback,
-                //TokenClientCredentialStyle = ClientCredentialStyle.PostBody,
                 Browser = browser,
-                ResponseMode = OidcClientOptions.AuthorizeResponseMode.Redirect
+                ResponseMode = OidcClientOptions.AuthorizeResponseMode.Redirect,
+                BackchannelHandler = new HttpClientHandler
+                {
+                    AllowAutoRedirect = true,
+                    ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true
+                }
             };
+
             client = new OidcClient(options);
+
+            SignIn = new DelegateCommand(OnSignInCommand);
         }
 
-        public override async void OnNavigatedTo(INavigationParameters parameters)
+        public override void OnNavigatedTo(INavigationParameters parameters)
+        {
+            SignIn.Execute();
+            base.OnNavigatedTo(parameters);
+        }
+
+        private async void OnSignInCommand()
         {
             var result = await client.LoginAsync(new LoginRequest
             {
@@ -49,9 +72,10 @@ namespace LibraProgramming.ChatRoom.Client.ViewModels
             //result.RefreshToken
             //result.User
 
-            apiClient.SetBearerToken(result.AccessToken);
+            await SecureStorage.SetAsync("AccessToken", result.AccessToken);
+            await SecureStorage.SetAsync("RefreshToken", result.RefreshToken);
 
-            base.OnNavigatedTo(parameters);
+            apiClient.SetBearerToken(result.AccessToken);
         }
     }
 }

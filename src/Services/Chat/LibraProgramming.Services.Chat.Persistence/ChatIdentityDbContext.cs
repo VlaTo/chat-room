@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LibraProgramming.ChatRoom.Services.Chat.Persistence
 {
-    public class ChatIdentityDbContext : IdentityDbContext<Customer>
+    public class ChatIdentityDbContext : IdentityDbContext<Customer, CustomerRole, long>
     {
-        public ChatIdentityDbContext(DbContextOptions options)
+        public ChatIdentityDbContext(DbContextOptions<ChatIdentityDbContext> options)
             : base(options)
         {
         }

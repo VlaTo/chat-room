@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Diagnostics;
+using IdentityModel;
 
 namespace LibraProgramming.ChatRoom.Client
 {
@@ -37,7 +39,12 @@ namespace LibraProgramming.ChatRoom.Client
 
         private GlobalSettings()
         {
-            BaseIdentityHostPath = new Uri("http://localhost:5000");
+            ClientId = "xamarin.application";
+            ClientSecret = "xamarin".ToSha256();
+
+            BaseIdentityHostPath = new Uri("https://localhost:5001");
+
+            Callback = "xamarinformsclient://callback";
         }
     }
 }

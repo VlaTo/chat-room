@@ -27,9 +27,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatRoom.Client.Android", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatRoom.Client.UWP", "src\Clients\LibraProgramming.ChatRoom.Client.UWP\ChatRoom.Client.UWP.csproj", "{FCCB20B8-D417-4CF1-9404-9D6FE4D85AC8}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LibraProgramming.ChatRoom.Domain", "src\Common\LibraProgramming.ChatRoom.Domain\LibraProgramming.ChatRoom.Domain.csproj", "{316637F6-EF10-48D1-A7C0-86C67A45C37B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChatRoom.Domain", "src\Common\LibraProgramming.ChatRoom.Domain\ChatRoom.Domain.csproj", "{316637F6-EF10-48D1-A7C0-86C67A45C37B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chat.Persistence", "src\Services\Chat\LibraProgramming.Services.Chat.Persistence\Chat.Persistence.csproj", "{DE546EB7-60B5-4D87-9226-E5C1AB822F93}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Chat.Persistence", "src\Services\Chat\LibraProgramming.Services.Chat.Persistence\Chat.Persistence.csproj", "{DE546EB7-60B5-4D87-9226-E5C1AB822F93}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{7DDD03A6-9BC6-4E0A-9F80-F265E5C77DAD}"
 	ProjectSection(SolutionItems) = preProject

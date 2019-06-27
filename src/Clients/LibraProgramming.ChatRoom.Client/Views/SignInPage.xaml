@@ -11,9 +11,12 @@
     mc:Ignorable="d">
     <ContentPage.Content>
         <StackLayout>
-            <Label Text="Welcome to Xamarin.Forms!"
-                VerticalOptions="CenterAndExpand" 
-                HorizontalOptions="CenterAndExpand" />
+            <Button
+                Text="Sign in"
+                Command="{Binding Path=SignIn, Mode=OneTime}"
+                VerticalOptions="CenterAndExpand"
+                HorizontalOptions="CenterAndExpand">
+            </Button>
         </StackLayout>
     </ContentPage.Content>
 </ContentPage>

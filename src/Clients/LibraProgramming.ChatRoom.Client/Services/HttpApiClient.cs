@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Mime;
+using System.Reflection;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using System.Threading.Tasks;
 using IdentityModel.Client;
@@ -24,7 +27,15 @@ namespace LibraProgramming.ChatRoom.Client.Services
 
         public HttpApiClient(Uri basePath)
         {
-            httpClient = new HttpClient
+
+            var temp = new HttpClientHandler
+            {
+                AllowAutoRedirect = true,
+                // developer hack
+                ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true
+            };
+
+            httpClient = new HttpClient(temp)
             {
                 BaseAddress = basePath
             };
@@ -55,7 +66,13 @@ namespace LibraProgramming.ChatRoom.Client.Services
                 catch (HttpRequestException e)
                 {
                     Console.WriteLine(e);
-                    throw;
+
+                    if ((e.HResult & 65535) == 12045)
+                    {
+                        //var errors = request.TransportInformation.ServerCertificateErrors;
+                    }
+
+                    return default;
                 }
             }
         }
@@ -63,6 +80,23 @@ namespace LibraProgramming.ChatRoom.Client.Services
         public void SetBearerToken(string bearerToken)
         {
             httpClient.SetBearerToken(bearerToken);
+        }
+
+        private X509Certificate2 LoadCertificate(string thumbprint)
+        {
+            using (var store = new X509Store(StoreLocation.LocalMachine))
+            {
+                store.Open(OpenFlags.ReadOnly);
+
+                var certificates = store.Certificates.Find(X509FindType.FindByThumbprint, thumbprint, false);
+
+                if (0 < certificates.Count)
+                {
+                    return certificates[0];
+                }
+            }
+
+            return null;
         }
     }
 }

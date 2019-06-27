@@ -8,15 +8,14 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="AutoMapper" Version="8.1.1" />
-    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="6.1.1" />
-    <PackageReference Include="IdentityServer4.AspNetIdentity" Version="3.0.0-preview3.4" />
-    <PackageReference Include="IdentityServer4.EntityFramework" Version="3.0.0-preview3.4" />
+    <PackageReference Include="AutoMapper" Version="8.0.0" />
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="6.0.0" />
+    <PackageReference Include="IdentityServer4.AspNetIdentity" Version="2.4.0" />
+    <PackageReference Include="IdentityServer4.EntityFramework" Version="2.4.0" />
     <PackageReference Include="LibraProgramming.Hessian" Version="0.1.3-build.20190531.1" />
     <PackageReference Include="MediatR" Version="7.0.0" />
     <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="7.0.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.0.0-preview6.19304.10" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.0.0-preview6.19304.10">
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="2.2.4">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
@@ -27,7 +26,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Common\LibraProgramming.ChatRoom.Domain\LibraProgramming.ChatRoom.Domain.csproj" />
+    <ProjectReference Include="..\..\..\Common\LibraProgramming.ChatRoom.Domain\ChatRoom.Domain.csproj" />
     <ProjectReference Include="..\LibraProgramming.Services.Chat.Contracts\Chat.Contracts.csproj" />
     <ProjectReference Include="..\LibraProgramming.Services.Chat.Persistence\Chat.Persistence.csproj" />
   </ItemGroup>

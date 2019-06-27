@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using IdentityModel;
 using IdentityServer4.Services;
 using IdentityServer4.Stores;
 using LibraProgramming.ChatRoom.Services.Chat.Api.Core;
@@ -11,6 +12,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 
@@ -28,7 +30,7 @@ namespace LibraProgramming.ChatRoom.Services.Chat.Api.Controllers
         //private readonly ICaptcha captcha;
         private readonly IWebHostEnvironment environment;
         //private readonly IEventService eventService;
-        private readonly IStringLocalizer<AccountController> localizer;
+        //private readonly IStringLocalizer<AccountController> localizer;
         private readonly ILogger<AccountController> logger;
 
         public AccountController(
@@ -40,7 +42,7 @@ namespace LibraProgramming.ChatRoom.Services.Chat.Api.Controllers
             //ICaptcha captcha,
             IWebHostEnvironment environment,
             //IEventService eventService,
-            IStringLocalizer<AccountController> localizer,
+            //IStringLocalizer<AccountController> localizer,
             ILogger<AccountController> logger)
         {
             //this.mediator = mediator;
@@ -51,7 +53,7 @@ namespace LibraProgramming.ChatRoom.Services.Chat.Api.Controllers
             //this.captcha = captcha;
             this.environment = environment;
             //this.eventService = eventService;
-            this.localizer = localizer;
+            //this.localizer = localizer;
             this.logger = logger;
         }
 
@@ -71,6 +73,31 @@ namespace LibraProgramming.ChatRoom.Services.Chat.Api.Controllers
             }
 
             return View(model);
+        }
+
+        [HttpGet("error")]
+        public async Task<IActionResult> Error([FromQuery] string errorId)
+        {
+            // retrieve error details from identityserver
+            var error = await interactions.GetErrorContextAsync(errorId);
+
+            if (null == error)
+            {
+                return View(new ErrorModel(null));
+            }
+
+            if (false == environment.IsDevelopment())
+            {
+                // only show in development
+                error.ErrorDescription = null;
+            }
+
+            if (OidcConstants.ResponseModes.Fragment == error.ResponseMode)
+            {
+                return View(new ErrorModel(error));
+            }
+
+            return View(new ErrorModel(null));
         }
 
         private async Task<SignInViewModel> CreateSigninModelAsync(string returnUrl)

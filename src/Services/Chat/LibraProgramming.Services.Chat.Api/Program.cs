@@ -1,13 +1,15 @@
 ﻿using AutoMapper;
-using Blueshift.EntityFrameworkCore.MongoDB.Infrastructure;
 using IdentityServer4.Configuration;
+using IdentityServer4.EntityFramework.DbContexts;
 using LibraProgramming.ChatRoom.Domain.Models;
 using LibraProgramming.ChatRoom.Domain.Results;
+using LibraProgramming.ChatRoom.Services.Chat.Api.Configuration.IdentityServer;
 using LibraProgramming.ChatRoom.Services.Chat.Api.Core;
 using LibraProgramming.ChatRoom.Services.Chat.Api.Core.Models;
 using LibraProgramming.ChatRoom.Services.Chat.Api.Extensions;
 using LibraProgramming.ChatRoom.Services.Chat.Persistence;
 using LibraProgramming.ChatRoom.Services.Chat.Persistence.Models;
+using LibraProgramming.ChatRoom.Services.Chat.Persistence.Seeds;
 using LibraProgramming.Services.Chat.Contracts;
 using MediatR;
 using Microsoft.AspNetCore;
@@ -15,6 +17,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -24,6 +27,7 @@ using Orleans;
 using Orleans.Configuration;
 using Orleans.Hosting;
 using System;
+using Microsoft.AspNetCore.Http;
 
 namespace LibraProgramming.ChatRoom.Services.Chat.Api
 {
@@ -88,14 +92,12 @@ namespace LibraProgramming.ChatRoom.Services.Chat.Api
                             return client;
                         });
 
-                    var connectionString = context.Configuration.GetConnectionString("Identity");
-
                     services
                         .AddDbContext<ChatIdentityDbContext>(options =>
                         {
-                            options.UseMongoDb(connectionString);
+                            options.UseSqlite(context.Configuration.GetConnectionString("Chat"));
                         })
-                        .AddIdentity<Customer, IdentityRole>(options =>
+                        .AddIdentity<Customer, CustomerRole>(options =>
                         {
                             options.User.RequireUniqueEmail = true;
                         })
@@ -114,8 +116,8 @@ namespace LibraProgramming.ChatRoom.Services.Chat.Api
                                 EnableUserInfoEndpoint = true
                             };
 
-                            options.Events.RaiseErrorEvents = true;
-                            options.Events.RaiseSuccessEvents = true;
+                            //options.Events.RaiseErrorEvents = true;
+                            //options.Events.RaiseSuccessEvents = true;
 
                             options.UserInteraction.LoginUrl = "/Account/SignIn";
                             options.UserInteraction.ConsentUrl = "Consent/Confirm";
@@ -128,14 +130,14 @@ namespace LibraProgramming.ChatRoom.Services.Chat.Api
                         {
                             options.ConfigureDbContext = database =>
                             {
-                                database.UseMongoDb(connectionString);
+                                database.UseSqlite(context.Configuration.GetConnectionString("Identity"));
                             };
                         })
                         .AddOperationalStore(options =>
                         {
                             options.ConfigureDbContext = database =>
                             {
-                                database.UseMongoDb(connectionString);
+                                database.UseSqlite(context.Configuration.GetConnectionString("Identity"));
                             };
                         });
 
@@ -211,9 +213,22 @@ namespace LibraProgramming.ChatRoom.Services.Chat.Api
                     services
                         .AddRazorPages(options =>
                         {
-                            options.RootDirectory = "/Pages";
+                            //options.RootDirectory = "/Pages";
                         })
                         .SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
+
+                    services
+                        .AddHsts(options =>
+                        {
+                            options.Preload = true;
+                            options.IncludeSubDomains = true;
+                            //options.ExcludedHosts.Add("http://localhost:5000");
+                        })
+                        .AddHttpsRedirection(options =>
+                        {
+                            options.RedirectStatusCode = StatusCodes.Status307TemporaryRedirect;
+                            options.HttpsPort = 5001;
+                        });
 
                     services
                         .AddOidcStateDataFormatterCache()
@@ -225,6 +240,13 @@ namespace LibraProgramming.ChatRoom.Services.Chat.Api
                     {
                         options.Cookie.Name = "Chat.Identity";
                     });
+
+                    var seed = context.Configuration.GetValue<string>("seed");
+
+                    if (false == String.IsNullOrEmpty(seed))
+                    {
+                        services.AddScoped<ConfigurationDbSetup>();
+                    }
                 })
                 .Configure(app =>
                 {
@@ -235,8 +257,14 @@ namespace LibraProgramming.ChatRoom.Services.Chat.Api
                     {
                         app.UseDeveloperExceptionPage();
                     }
+                    else
+                    {
+                        app.UseExceptionHandler("/Error");
+                        app.UseHsts();
+                    }
 
                     app
+                        .UseHttpsRedirection()
                         .UseWebSockets(new WebSocketOptions
                         {
                             KeepAliveInterval = TimeSpan.FromSeconds(30.0d),
@@ -246,12 +274,27 @@ namespace LibraProgramming.ChatRoom.Services.Chat.Api
                         .UseAuthentication()
                         .UseIdentityServer()
                         .UseRouting()
+                        .UseAuthorization()
                         .UseEndpoints(routes =>
                         {
                             routes.MapControllers();
                         });
                 })
                 .Build();
+
+            host.MigrateDbContext<ConfigurationDbContext>(async (context, services) =>
+            {
+                var setup = services.GetService<ConfigurationDbSetup>();
+
+                if (null != setup)
+                {
+                    await setup.SeedAsync(
+                        IdentityServerConfiguration.GetClients(),
+                        IdentityServerConfiguration.GetIdentityResources(),
+                        IdentityServerConfiguration.GetApiResources()
+                    );
+                }
+            });
 
             /*using (var scope = host.Services.CreateScope())
             {
