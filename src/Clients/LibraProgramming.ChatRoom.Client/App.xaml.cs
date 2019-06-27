@@ -47,12 +47,14 @@ namespace LibraProgramming.ChatRoom.Client
 
         protected override void RegisterTypes(IContainerRegistry container)
         {
+            container.Register<IApiClient, HttpApiClient>();
             container.Register<IChatRoomService, ChatRoomService>();
             container.RegisterSingleton<ChatDatabaseContext>();
             container.RegisterSingleton<IMessageService, MessageService>();
 
             //container.RegisterForNavigation<PrismNavigationPage>(nameof(PrismNavigationPage));
-            container.RegisterForNavigation<NavigationPage>(nameof(NavigationPage));
+            container.RegisterForNavigation<NavigationPage>("nav");
+            container.RegisterForNavigation<SignInPage, SignInPageViewModel>("signin");
             container.RegisterForNavigation<MainPage, MainPageViewModel>(nameof(Views.MainPage));
             container.RegisterForNavigation<LiveChatPage, LiveChatPageViewModel>(nameof(LiveChatPage));
             container.RegisterForNavigation<AddNewRoomPage, AddNewRoomViewModel>(nameof(AddNewRoomPage));

@@ -1,13 +1,23 @@
 ﻿using AutoMapper;
+using IdentityServer4.Configuration;
+using IdentityServer4.EntityFramework.DbContexts;
+using LibraProgramming.ChatRoom.Domain.Models;
 using LibraProgramming.ChatRoom.Domain.Results;
+using LibraProgramming.ChatRoom.Services.Chat.Api.Configuration.IdentityServer;
 using LibraProgramming.ChatRoom.Services.Chat.Api.Core;
 using LibraProgramming.ChatRoom.Services.Chat.Api.Core.Models;
 using LibraProgramming.ChatRoom.Services.Chat.Api.Extensions;
+using LibraProgramming.ChatRoom.Services.Chat.Persistence;
+using LibraProgramming.ChatRoom.Services.Chat.Persistence.Models;
+using LibraProgramming.ChatRoom.Services.Chat.Persistence.Seeds;
 using LibraProgramming.Services.Chat.Contracts;
 using MediatR;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -17,7 +27,7 @@ using Orleans;
 using Orleans.Configuration;
 using Orleans.Hosting;
 using System;
-using LibraProgramming.ChatRoom.Domain.Models;
+using Microsoft.AspNetCore.Http;
 
 namespace LibraProgramming.ChatRoom.Services.Chat.Api
 {
@@ -83,6 +93,55 @@ namespace LibraProgramming.ChatRoom.Services.Chat.Api
                         });
 
                     services
+                        .AddDbContext<ChatIdentityDbContext>(options =>
+                        {
+                            options.UseSqlite(context.Configuration.GetConnectionString("Chat"));
+                        })
+                        .AddIdentity<Customer, CustomerRole>(options =>
+                        {
+                            options.User.RequireUniqueEmail = true;
+                        })
+                        .AddEntityFrameworkStores<ChatIdentityDbContext>()
+                        .AddDefaultTokenProviders();
+
+                    services
+                        .AddIdentityServer(options =>
+                        {
+                            options.Endpoints = new EndpointsOptions
+                            {
+                                EnableDiscoveryEndpoint = true,
+                                EnableAuthorizeEndpoint = true,
+                                EnableCheckSessionEndpoint = true,
+                                EnableEndSessionEndpoint = true,
+                                EnableUserInfoEndpoint = true
+                            };
+
+                            //options.Events.RaiseErrorEvents = true;
+                            //options.Events.RaiseSuccessEvents = true;
+
+                            options.UserInteraction.LoginUrl = "/Account/SignIn";
+                            options.UserInteraction.ConsentUrl = "Consent/Confirm";
+                            options.UserInteraction.ErrorUrl = "/Account/Error";
+                        })
+                        // https://github.com/IdentityServer/IdentityServer4/blob/44651bea9b02c992902639b21205f433aad47d03/src/IdentityServer4/src/Configuration/DependencyInjection/BuilderExtensions/Crypto.cs
+                        .AddSigninCredentials(context.Configuration.GetSection("IdentityServer:Key"))
+                        .AddAspNetIdentity<Customer>()
+                        .AddConfigurationStore(options =>
+                        {
+                            options.ConfigureDbContext = database =>
+                            {
+                                database.UseSqlite(context.Configuration.GetConnectionString("Identity"));
+                            };
+                        })
+                        .AddOperationalStore(options =>
+                        {
+                            options.ConfigureDbContext = database =>
+                            {
+                                database.UseSqlite(context.Configuration.GetConnectionString("Identity"));
+                            };
+                        });
+
+                    services
                         .AddAutoMapper(options =>
                             {
                                 // action results
@@ -131,7 +190,10 @@ namespace LibraProgramming.ChatRoom.Services.Chat.Api
                                         map => map.MapFrom(source => source.Description)
                                     );
                             },
-                            AppDomain.CurrentDomain.GetAssemblies())
+                            typeof(Program).Assembly
+                        );
+
+                    services
                         .AddMediatR(
                             typeof(Program).Assembly
                         );
@@ -143,12 +205,48 @@ namespace LibraProgramming.ChatRoom.Services.Chat.Api
                         {
                             options.Register<ChatRoomWebSocketHandler>("api/chat/{room:long}");
                         })
-                        .AddControllers()
-                        /*.AddJsonFormatters(options =>
+                        .AddControllers(options =>
                         {
-                            options.ContractResolver = new DefaultContractResolver();
-                        })*/
+                            options.EnableEndpointRouting = true;
+                        });
+
+                    services
+                        .AddRazorPages(options =>
+                        {
+                            //options.RootDirectory = "/Pages";
+                        })
+                        .SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
+
+                    services
+                        .AddHsts(options =>
+                        {
+                            options.Preload = true;
+                            options.IncludeSubDomains = true;
+                            //options.ExcludedHosts.Add("http://localhost:5000");
+                        })
+                        .AddHttpsRedirection(options =>
+                        {
+                            options.RedirectStatusCode = StatusCodes.Status307TemporaryRedirect;
+                            options.HttpsPort = 5001;
+                        });
+
+                    services
+                        .AddOidcStateDataFormatterCache()
+                        .AddAuthentication(IdentityConstants.ApplicationScheme)
+                        //.AddOpenIdConnect()
                         ;
+
+                    services.ConfigureApplicationCookie(options =>
+                    {
+                        options.Cookie.Name = "Chat.Identity";
+                    });
+
+                    var seed = context.Configuration.GetValue<string>("seed");
+
+                    if (false == String.IsNullOrEmpty(seed))
+                    {
+                        services.AddScoped<ConfigurationDbSetup>();
+                    }
                 })
                 .Configure(app =>
                 {
@@ -159,21 +257,44 @@ namespace LibraProgramming.ChatRoom.Services.Chat.Api
                     {
                         app.UseDeveloperExceptionPage();
                     }
+                    else
+                    {
+                        app.UseExceptionHandler("/Error");
+                        app.UseHsts();
+                    }
 
                     app
+                        .UseHttpsRedirection()
                         .UseWebSockets(new WebSocketOptions
                         {
                             KeepAliveInterval = TimeSpan.FromSeconds(30.0d),
                             ReceiveBufferSize = 8096
                         })
                         .UseMiddleware<WebSocketsMiddleware>()
+                        .UseAuthentication()
+                        .UseIdentityServer()
                         .UseRouting()
+                        .UseAuthorization()
                         .UseEndpoints(routes =>
                         {
                             routes.MapControllers();
                         });
                 })
                 .Build();
+
+            host.MigrateDbContext<ConfigurationDbContext>(async (context, services) =>
+            {
+                var setup = services.GetService<ConfigurationDbSetup>();
+
+                if (null != setup)
+                {
+                    await setup.SeedAsync(
+                        IdentityServerConfiguration.GetClients(),
+                        IdentityServerConfiguration.GetIdentityResources(),
+                        IdentityServerConfiguration.GetApiResources()
+                    );
+                }
+            });
 
             /*using (var scope = host.Services.CreateScope())
             {

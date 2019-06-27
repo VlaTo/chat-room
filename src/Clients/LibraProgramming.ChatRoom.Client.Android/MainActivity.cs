@@ -23,7 +23,15 @@ namespace LibraProgramming.ChatRoom.Client.Droid
             base.OnCreate(bundle);
 
             Forms.Init(this, bundle);
+            Xamarin.Essentials.Platform.Init(this, bundle);
+
             LoadApplication(new App(new AndroidInitializer()));
+        }
+
+        public override void OnRequestPermissionsResult(int requestCode, string[] permissions, Permission[] grantResults)
+        {
+            Xamarin.Essentials.Platform.OnRequestPermissionsResult(requestCode, permissions, grantResults);
+            base.OnRequestPermissionsResult(requestCode, permissions, grantResults);
         }
     }
 

@@ -2,12 +2,16 @@
 using Prism.Commands;
 using Prism.Navigation;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Security.Claims;
 using System.Security.Principal;
 using System.Threading;
 using LibraProgramming.ChatRoom.Client.Controls;
-using LibraProgramming.ChatRoom.Client.Models.Database;
+using LibraProgramming.ChatRoom.Client.Models.Data;
+using LibraProgramming.ChatRoom.Client.Persistence;
+using Microsoft.EntityFrameworkCore;
 using Xamarin.Forms;
 
 namespace LibraProgramming.ChatRoom.Client.ViewModels
@@ -17,10 +21,10 @@ namespace LibraProgramming.ChatRoom.Client.ViewModels
         private readonly IChatRoomService chatService;
         private readonly IMessageService messageService;
         private string description;
-        private string message;
-        private InteractionRequest<NewMessageContext> newMessageRequest;
+        private string text;
         private IChatChannel channel;
         private IPrincipal author;
+        private long roomId;
 
         public ObservableCollection<ChatMessageViewModel> Messages
         {
@@ -34,8 +38,8 @@ namespace LibraProgramming.ChatRoom.Client.ViewModels
 
         public string Message
         {
-            get => message;
-            set => SetProperty(ref message, value);
+            get => text;
+            set => SetProperty(ref text, value);
         }
 
         public string Description
@@ -49,36 +53,75 @@ namespace LibraProgramming.ChatRoom.Client.ViewModels
         public LiveChatPageViewModel(
             INavigationService navigationService,
             IChatRoomService chatService,
-            IMessageService messageService)
+            IUserInformation userInformation,
+            ChatDbContext context)
             : base(navigationService)
         {
             this.chatService = chatService;
-            this.messageService = messageService;
+            this.userInformation = userInformation;
+            this.context = context;
 
             SendCommand = new DelegateCommand(OnSendCommand);
             Messages = new ObservableCollection<ChatMessageViewModel>();
             newMessageRequest = new InteractionRequest<NewMessageContext>();
+
+            /*Messages.Add(new ChatMessageViewModel
+            {
+                Author = "User0123",
+                IsMyMessage = false,
+                Text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut sagittis urna nisi, eget efficitur ipsum posuere sed.",
+                Created = DateTime.Now - TimeSpan.FromHours(1.0d)
+            });
+            Messages.Add(new ChatMessageViewModel
+            {
+                Author = "User0123",
+                IsMyMessage = false,
+                Text = "Nullam tristique urna non tortor iaculis",
+                Created = DateTime.Now - TimeSpan.FromHours(1.5d)
+            });*/
         }
 
         public override async void OnNavigatedTo(INavigationParameters parameters)
         {
-            var id = parameters.GetValue<long>("room");
-            var room = await chatService.GetRoomAsync(id);
+            roomId = parameters.GetValue<long>("room");
+            var room = await context.Rooms.FirstOrDefaultAsync(entity => entity.Id == roomId);
 
             if (null == room)
             {
-                return;
+                var chatRoom = await chatService.GetRoomAsync(roomId);
+                room = new Room
+                {
+                    Title = chatRoom.Title,
+                    Description = chatRoom.Description,
+                    Messages = new Collection<Message>()
+                };
+
+                await context.Rooms.AddAsync(room);
+                await context.SaveChangesAsync();
             }
 
-            Title = room.Title;
-            Description = room.Description;
-
+            var username = await userInformation.GetUserNameAsync();
             author = new GenericPrincipal(
-                new GenericIdentity($"User{(ushort) DateTime.Now.Ticks}", ClaimsIdentity.DefaultNameClaimType),
+                new GenericIdentity(username, ClaimsIdentity.DefaultNameClaimType),
                 new[] {"Author"}
             );
 
-            channel = await chatService.OpenChatAsync(id, author, CancellationToken.None);
+            var messages = await context.Messages
+                .Where(entity => entity.RoomId == roomId)
+                .OrderBy(entity => entity.Id)
+                .ToArrayAsync();
+
+            foreach (var item in messages)
+            {
+                Messages.Add(new ChatMessageViewModel
+                {
+                    Author = item.Author,
+                    Text = item.Text,
+                    Created = item.Created
+                });
+            }
+
+            channel = await chatService.OpenChatAsync(roomId, author, CancellationToken.None);
             channel.MessageArrived += OnMessageArrived;
 
             foreach (var message in messageService.GetMessages())
@@ -106,21 +149,26 @@ namespace LibraProgramming.ChatRoom.Client.ViewModels
             await channel.SendAsync(message);
         }
 
-        private void OnMessageArrived(object sender, ChatMessageEventArgs e)
+        private async void OnMessageArrived(object sender, ChatMessageEventArgs e)
         {
-            messageService.Save(new Message
+            var message = e.Message;
+
+            context.Messages.Add(new Message
             {
-                Author = e.Message.Author,
-                Content = e.Message.Content,
-                Created = e.Message.Created
+                Author = message.Author,
+                Text = message.Content,
+                Created = message.Created,
+                RoomId = roomId
             });
+
+            await context.SaveChangesAsync();
 
             var model = new ChatMessageViewModel
             {
-                Author = e.Message.Author,
-                IsMyMessage = IsSameAuthor(e.Message.Author),
-                Text = e.Message.Content,
-                Created = e.Message.Created
+                Author = message.Author,
+                IsMyMessage = IsSameAuthor(message.Author),
+                Text = message.Content,
+                Created = message.Created
             };
 
             newMessageRequest.Raise(

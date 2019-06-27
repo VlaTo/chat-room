@@ -1,4 +1,7 @@
-﻿using LibraProgramming.ChatRoom.Client.UWP.Extensions;
+﻿using IdentityModel.OidcClient.Browser;
+using LibraProgramming.ChatRoom.Client.Services;
+using LibraProgramming.ChatRoom.Client.UWP.Extensions;
+using LibraProgramming.ChatRoom.Client.UWP.Services;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Debug;
 using Prism;
@@ -33,6 +36,7 @@ namespace LibraProgramming.ChatRoom.Client.UWP
         {
             // Register any platform specific implementations
             var unity = container.GetContainer();
+
             unity.AddExtension(new LoggingExtension());
 
             var factory = new LoggerFactory();
@@ -40,6 +44,8 @@ namespace LibraProgramming.ChatRoom.Client.UWP
             factory.AddProvider(new DebugLoggerProvider());
 
             container.RegisterInstance(typeof(ILogger), factory.CreateLogger("Debug"));
+            container.RegisterSingleton<IUserInformation, UwpUserInformationService>();
+            container.Register<IBrowser, WebAuthBrokerService>();
         }
     }
 }
