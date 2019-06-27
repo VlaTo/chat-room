@@ -37,7 +37,7 @@ namespace LibraProgramming.ChatRoom.Client
             await dbContext.Database.EnsureCreatedAsync();
             await dbContext.Database.MigrateAsync();
 
-            var result = await NavigationService.NavigateAsync($"{nameof(NavigationPage)}/{nameof(Views.MainPage)}");
+            var result = await NavigationService.NavigateAsync("nav/signin");
 
             if (false == result.Success)
             {

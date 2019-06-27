@@ -20,6 +20,8 @@ namespace LibraProgramming.ChatRoom.Client.ViewModels
     {
         private readonly IChatRoomService chatService;
         private readonly IMessageService messageService;
+        private readonly InteractionRequest<NewMessageContext> newMessageRequest;
+        private readonly ChatDbContext context;
         private string description;
         private string text;
         private IChatChannel channel;
@@ -53,12 +55,12 @@ namespace LibraProgramming.ChatRoom.Client.ViewModels
         public LiveChatPageViewModel(
             INavigationService navigationService,
             IChatRoomService chatService,
-            IUserInformation userInformation,
+            //IUserInformation userInformation,
             ChatDbContext context)
             : base(navigationService)
         {
             this.chatService = chatService;
-            this.userInformation = userInformation;
+            //this.userInformation = userInformation;
             this.context = context;
 
             SendCommand = new DelegateCommand(OnSendCommand);
@@ -100,9 +102,9 @@ namespace LibraProgramming.ChatRoom.Client.ViewModels
                 await context.SaveChangesAsync();
             }
 
-            var username = await userInformation.GetUserNameAsync();
+            //var username = await userInformation.GetUserNameAsync();
             author = new GenericPrincipal(
-                new GenericIdentity(username, ClaimsIdentity.DefaultNameClaimType),
+                new GenericIdentity("TestUser", ClaimsIdentity.DefaultNameClaimType),
                 new[] {"Author"}
             );
 

@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
+using Windows.Foundation;
 using Windows.Security.Authentication.Web;
 using IdentityModel.OidcClient;
 using IdentityModel.OidcClient.Browser;
@@ -22,20 +24,17 @@ namespace LibraProgramming.ChatRoom.Client.UWP.Services
             this.enableWindowsAuthentication = enableWindowsAuthentication;
         }
 
+        // https://docs.microsoft.com/en-us/windows/uwp/security/web-authentication-broker
         public async Task<BrowserResult> InvokeAsync(BrowserOptions options)
         {
-            var wabOptions = GetWebAuthOptions(options, false);
+            var wabOptions = GetWebAuthOptions(options, GlobalSettings.Instance.SilentMode);
             WebAuthenticationResult result;
 
             try
             {
-                var brokenAbsolutePath = WebAuthenticationBroker.GetCurrentApplicationCallbackUri().AbsoluteUri;
-                var flag = String.Equals(options.EndUrl, brokenAbsolutePath, StringComparison.Ordinal);
-                var requestUri = new Uri(options.StartUrl);
+                var brokerAbsolutePath = WebAuthenticationBroker.GetCurrentApplicationCallbackUri().AbsoluteUri;
 
-                result = flag
-                    ? await WebAuthenticationBroker.AuthenticateAsync(wabOptions, requestUri)
-                    : await WebAuthenticationBroker.AuthenticateAsync(wabOptions, requestUri, new Uri(options.EndUrl));
+                result = await BrokerSigninAsync(options, brokerAbsolutePath, wabOptions, CancellationToken.None);
             }
             catch (Exception ex)
             {
@@ -105,6 +104,28 @@ namespace LibraProgramming.ChatRoom.Client.UWP.Services
             }
 
             return result;
+        }
+
+        private static Task<WebAuthenticationResult> BrokerSigninAsync(
+            BrowserOptions options,
+            string brokerAbsolutePath,
+            WebAuthenticationOptions wabOptions,
+            CancellationToken cancellationToken)
+        {
+            IAsyncOperation<WebAuthenticationResult> result;
+            var requestUri = new Uri(options.StartUrl);
+
+            if (String.Equals(options.EndUrl, brokerAbsolutePath, StringComparison.Ordinal))
+            {
+                result = WebAuthenticationBroker.AuthenticateAsync(wabOptions, requestUri);
+            }
+            else
+            {
+                var callbackUri = new Uri(options.EndUrl);
+                result = WebAuthenticationBroker.AuthenticateAsync(wabOptions, requestUri, callbackUri);
+            }
+
+            return result.AsTask(cancellationToken);
         }
     }
 }
