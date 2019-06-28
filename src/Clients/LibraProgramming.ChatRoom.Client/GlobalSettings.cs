@@ -27,10 +27,14 @@ namespace LibraProgramming.ChatRoom.Client
         public string Callback
         {
             get;
-            set;
         }
 
         public Uri BaseIdentityHostPath
+        {
+            get;
+        }
+
+        public bool SilentMode
         {
             get;
         }
@@ -41,6 +45,7 @@ namespace LibraProgramming.ChatRoom.Client
         {
             ClientId = "xamarin.application";
             ClientSecret = "xamarin".ToSha256();
+            SilentMode = false;
 
             BaseIdentityHostPath = new Uri("https://localhost:5001");
 

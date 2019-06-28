@@ -33,6 +33,7 @@
             </Grid.RowDefinitions>
             <ListView
                 Grid.Row="0"
+                BackgroundColor="#F8F8F8"
                 ItemsSource="{Binding Path=Messages, Mode=OneWay}"
                 SelectionMode="None"
                 SeparatorVisibility="Default">
@@ -54,13 +55,9 @@
                                         <Setter Property="Margin">
                                             <OnPlatform x:TypeArguments="Thickness">
                                                 <On Platform="Android" Value="8,4" />
-                                                <On Platform="UWP" Value="48,8,8,8" />
+                                                <On Platform="UWP" Value="88,8,8,8" />
                                             </OnPlatform>
                                         </Setter>
-                                        <Setter
-                                            Property="BackgroundColor"
-                                            Value="AntiqueWhite"
-                                        />
                                     </MultiTrigger>
                                     <MultiTrigger TargetType="StackLayout">
                                         <MultiTrigger.Conditions>
@@ -72,25 +69,62 @@
                                         <Setter Property="Margin">
                                             <OnPlatform x:TypeArguments="Thickness">
                                                 <On Platform="Android" Value="8,4" />
-                                                <On Platform="UWP" Value="8,8,48,8" />
+                                                <On Platform="UWP" Value="8,8,88,8" />
                                             </OnPlatform>
                                         </Setter>
-                                        <Setter
-                                            Property="BackgroundColor"
-                                            Value="Aquamarine"
-                                        />
                                     </MultiTrigger>
                                 </StackLayout.Triggers>
-                                <Label
-                                    FontSize="Small"
-                                    Text="{Binding Path=Author, Mode=OneTime}"
-                                    FontAttributes="Bold"
-                                />
-                                <Label
-                                    FontSize="Small"
-                                    Text="{Binding Path=Text, Mode=OneTime}"
-                                    LineBreakMode="WordWrap"
-                                />
+                                <Frame
+                                    BackgroundColor="#ECE7F6"
+                                    CornerRadius="4">
+                                    <Frame.Triggers>
+                                        <MultiTrigger TargetType="Frame">
+                                            <MultiTrigger.Conditions>
+                                                <BindingCondition
+                                                    Binding="{Binding Path=IsMyMessage, Mode=OneTime}"
+                                                    Value="true"
+                                                />
+                                            </MultiTrigger.Conditions>
+                                            <Setter
+                                                Property="BackgroundColor"
+                                                Value="#ECE7F6"
+                                            />
+                                        </MultiTrigger>
+                                        <MultiTrigger TargetType="Frame">
+                                            <MultiTrigger.Conditions>
+                                                <BindingCondition
+                                                    Binding="{Binding Path=IsMyMessage, Mode=OneTime}"
+                                                    Value="false"
+                                                />
+                                            </MultiTrigger.Conditions>
+                                            <Setter
+                                                Property="BackgroundColor"
+                                                Value="#F8F2F7"
+                                            />
+                                        </MultiTrigger>
+                                    </Frame.Triggers>
+                                    <Label
+                                        FontSize="Small"
+                                        Text="{Binding Path=Text, Mode=OneTime}"
+                                        LineBreakMode="WordWrap"
+                                        Margin="8,4"
+                                    />
+                                </Frame>
+                                <StackLayout
+                                    Orientation="Horizontal"
+                                    HorizontalOptions="Fill"
+                                    Margin="4,4,4,8">
+                                    <Label
+                                        FontSize="Micro"
+                                        Text="{Binding Path=Author, Mode=OneTime}"
+                                        HorizontalOptions="StartAndExpand"
+                                    />
+                                    <Label
+                                        FontSize="Micro"
+                                        Text="{Binding Path=Created, Mode=OneTime}"
+                                        HorizontalOptions="EndAndExpand"
+                                    />
+                                </StackLayout>
                             </StackLayout>
                         </ViewCell>
                     </DataTemplate>

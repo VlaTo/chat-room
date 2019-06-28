@@ -19,9 +19,9 @@ namespace LibraProgramming.ChatRoom.Client.ViewModels
     public class LiveChatPageViewModel : PageViewModelBase
     {
         private readonly IChatRoomService chatService;
-        private readonly IUserInformation userInformation;
-        private readonly ChatDbContext context;
+        private readonly IMessageService messageService;
         private readonly InteractionRequest<NewMessageContext> newMessageRequest;
+        private readonly ChatDbContext context;
         private string description;
         private string text;
         private IChatChannel channel;
@@ -55,12 +55,12 @@ namespace LibraProgramming.ChatRoom.Client.ViewModels
         public LiveChatPageViewModel(
             INavigationService navigationService,
             IChatRoomService chatService,
-            IUserInformation userInformation,
+            //IUserInformation userInformation,
             ChatDbContext context)
             : base(navigationService)
         {
             this.chatService = chatService;
-            this.userInformation = userInformation;
+            //this.userInformation = userInformation;
             this.context = context;
 
             SendCommand = new DelegateCommand(OnSendCommand);
@@ -102,9 +102,9 @@ namespace LibraProgramming.ChatRoom.Client.ViewModels
                 await context.SaveChangesAsync();
             }
 
-            var username = await userInformation.GetUserNameAsync();
+            //var username = await userInformation.GetUserNameAsync();
             author = new GenericPrincipal(
-                new GenericIdentity(username, ClaimsIdentity.DefaultNameClaimType),
+                new GenericIdentity("TestUser", ClaimsIdentity.DefaultNameClaimType),
                 new[] {"Author"}
             );
 
@@ -125,6 +125,17 @@ namespace LibraProgramming.ChatRoom.Client.ViewModels
 
             channel = await chatService.OpenChatAsync(roomId, author, CancellationToken.None);
             channel.MessageArrived += OnMessageArrived;
+
+            foreach (var message in messageService.GetMessages())
+            {
+                Messages.Add(new ChatMessageViewModel
+                {
+                    Author = message.Author,
+                    IsMyMessage = IsSameAuthor(message.Author),
+                    Text = message.Content,
+                    Created = message.Created
+                });
+            }
         }
 
         public override void OnNavigatedFrom(INavigationParameters parameters)

@@ -32,12 +32,11 @@ namespace LibraProgramming.ChatRoom.Client
         {
             InitializeComponent();
 
-            var context = Container.Resolve<ChatDbContext>();
+            var dbContext = Container.Resolve<ChatDatabaseContext>();
 
-            await context.Database.EnsureCreatedAsync();
-            await context.Database.MigrateAsync();
+            await dbContext.Database.EnsureCreatedAsync();
+            await dbContext.Database.MigrateAsync();
 
-            //var result = await NavigationService.NavigateAsync($"{nameof(NavigationPage)}/{nameof(Views.MainPage)}");
             var result = await NavigationService.NavigateAsync("nav/signin");
 
             if (false == result.Success)
@@ -50,7 +49,8 @@ namespace LibraProgramming.ChatRoom.Client
         {
             container.Register<IApiClient, HttpApiClient>();
             container.Register<IChatRoomService, ChatRoomService>();
-            container.RegisterSingleton<ChatDbContext>();
+            container.RegisterSingleton<ChatDatabaseContext>();
+            container.RegisterSingleton<IMessageService, MessageService>();
 
             //container.RegisterForNavigation<PrismNavigationPage>(nameof(PrismNavigationPage));
             container.RegisterForNavigation<NavigationPage>("nav");
