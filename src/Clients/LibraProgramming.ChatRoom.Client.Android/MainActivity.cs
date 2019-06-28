@@ -1,6 +1,8 @@
 ﻿using Android.App;
 using Android.Content.PM;
 using Android.OS;
+using IdentityModel.OidcClient.Browser;
+using LibraProgramming.ChatRoom.Client.Droid.Services;
 using Prism;
 using Prism.Ioc;
 using Xamarin.Forms;
@@ -37,9 +39,10 @@ namespace LibraProgramming.ChatRoom.Client.Droid
 
     public class AndroidInitializer : IPlatformInitializer
     {
-        public void RegisterTypes(IContainerRegistry containerRegistry)
+        public void RegisterTypes(IContainerRegistry registry)
         {
             // Register any platform specific implementations
+            registry.Register<IBrowser, ChromeCustomTabBrowser>();
         }
     }
 }

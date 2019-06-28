@@ -9,17 +9,17 @@ using Unity;
 
 namespace LibraProgramming.ChatRoom.Client.UWP.Services
 {
-    public sealed class WebAuthBrokerService : IBrowser
+    public sealed class WebAuthBrokerBrowser : IBrowser
     {
         private readonly bool enableWindowsAuthentication;
 
         [InjectionConstructor]
-        public WebAuthBrokerService()
+        public WebAuthBrokerBrowser()
             : this(false)
         {
         }
 
-        public WebAuthBrokerService(bool enableWindowsAuthentication)
+        public WebAuthBrokerBrowser(bool enableWindowsAuthentication)
         {
             this.enableWindowsAuthentication = enableWindowsAuthentication;
         }

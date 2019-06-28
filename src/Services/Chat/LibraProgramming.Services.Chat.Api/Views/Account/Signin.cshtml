@@ -2,5 +2,26 @@
 
 @if (Model.EnableLocalLogin)
 {
-    <div> Local Signin</div>
+    <div class="row h-100 align-items-center justify-content-center">
+        <form asp-controller="Account" asp-action="Signin" method="post" novalidate="">
+            <fieldset>
+                <input type="hidden" asp-for="ReturnUrl" />
+                <div class="form-group">
+                    <label asp-for="Email">@Html.DisplayNameFor(model=>model.Email)</label>
+                    <input asp-for="Email" class="form-control" aria-describedby="email-description" placeholder="Email..." />
+                    <small id="email-description">Enter your email to proceed signin</small>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Password">@Html.DisplayNameFor(model=>model.Password)</label>
+                    <input asp-for="Password" class="form-control" aria-describedby="password-description" placeholder="Password..." />
+                    <small id="password-description">Enter your password to proceed signin</small>
+                </div>
+                <div class="form-group form-check">
+                    <input asp-for="AllowRememberMe" class="form-check-input" />
+                    <label asp-for="AllowRememberMe" class="form-check-label">Remember me</label>
+                </div>
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </fieldset>
+        </form>
+    </div>
 }

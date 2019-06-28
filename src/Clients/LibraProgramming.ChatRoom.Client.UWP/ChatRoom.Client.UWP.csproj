@@ -100,7 +100,7 @@
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\UwpUserInformationService.cs" />
-    <Compile Include="Services\WebAuthBrokerService.cs" />
+    <Compile Include="Services\WebAuthBrokerBrowser.cs" />
   </ItemGroup>
   <ItemGroup>
     <AppxManifest Include="Package.appxmanifest">

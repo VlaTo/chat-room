@@ -265,6 +265,7 @@ namespace LibraProgramming.ChatRoom.Services.Chat.Api
 
                     app
                         .UseHttpsRedirection()
+                        .UseStaticFiles()
                         .UseWebSockets(new WebSocketOptions
                         {
                             KeepAliveInterval = TimeSpan.FromSeconds(30.0d),

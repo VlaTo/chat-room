@@ -2,11 +2,16 @@
 using System.Linq;
 using System.Threading.Tasks;
 using IdentityModel;
+using IdentityServer4;
+using IdentityServer4.Events;
+using IdentityServer4.Models;
 using IdentityServer4.Services;
 using IdentityServer4.Stores;
 using LibraProgramming.ChatRoom.Services.Chat.Api.Core;
+using LibraProgramming.ChatRoom.Services.Chat.Api.Extensions;
 using LibraProgramming.ChatRoom.Services.Chat.Api.Models;
 using LibraProgramming.ChatRoom.Services.Chat.Persistence.Models;
+using MediatR;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
@@ -22,37 +27,37 @@ namespace LibraProgramming.ChatRoom.Services.Chat.Api.Controllers
     [Route("[controller]")]
     public sealed class AccountController : Controller
     {
-        //private readonly IMediator mediator;
+        private readonly IMediator mediator;
         private readonly IIdentityServerInteractionService interactions;
         private readonly IClientStore clientStore;
         private readonly IAuthenticationSchemeProvider schemeProvider;
         private readonly UserManager<Customer> customerManager;
         //private readonly ICaptcha captcha;
         private readonly IWebHostEnvironment environment;
-        //private readonly IEventService eventService;
+        private readonly IEventService eventService;
         //private readonly IStringLocalizer<AccountController> localizer;
         private readonly ILogger<AccountController> logger;
 
         public AccountController(
-            //IMediator mediator,
+            IMediator mediator,
             IIdentityServerInteractionService interactions,
             IClientStore clientStore,
             IAuthenticationSchemeProvider schemeProvider,
             UserManager<Customer> customerManager,
             //ICaptcha captcha,
             IWebHostEnvironment environment,
-            //IEventService eventService,
+            IEventService eventService,
             //IStringLocalizer<AccountController> localizer,
             ILogger<AccountController> logger)
         {
-            //this.mediator = mediator;
+            this.mediator = mediator;
             this.interactions = interactions;
             this.clientStore = clientStore;
             this.schemeProvider = schemeProvider;
             this.customerManager = customerManager;
             //this.captcha = captcha;
             this.environment = environment;
-            //this.eventService = eventService;
+            this.eventService = eventService;
             //this.localizer = localizer;
             this.logger = logger;
         }
@@ -75,6 +80,110 @@ namespace LibraProgramming.ChatRoom.Services.Chat.Api.Controllers
             return View(model);
         }
 
+        // POST /account/signin
+        [HttpPost("signin")]
+        [Consumes("application/x-www-form-urlencoded")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Signin([FromForm] SignInInputModel model, [FromForm] string button)
+        {
+            var context = await interactions.GetAuthorizationContextAsync(model.ReturnUrl);
+
+            if ("signin" != button)
+            {
+                logger.LogDebug("Signin executing");
+
+                if (null != context)
+                {
+                    await interactions.GrantConsentAsync(context, ConsentResponse.Denied);
+
+                    if (await clientStore.IsPkceClientAsync(context.ClientId))
+                    {
+                        return View("Redirect", new RedirectModel { RedirectUrl = model.ReturnUrl });
+                    }
+
+                    return Redirect(model.ReturnUrl);
+                }
+
+                return Redirect("~/");
+            }
+
+            if (ModelState.IsValid)
+            {
+                var result = await mediator.Send(new GetCustomerQuery(model.Email, model.Password), HttpContext.RequestAborted);
+
+                if (result.IsFailed)
+                {
+                    return View();
+                }
+
+                if (result.IsNotAllowed)
+                {
+                    return View();
+                }
+
+                if (result.IsLockedOut)
+                {
+                    return View();
+                }
+
+                if (result.RequiresTwoFactor)
+                {
+                    return View();
+                }
+
+                if (result.IsSucceeded)
+                {
+                    var customer = result.Customer;
+
+                    await eventService.RaiseAsync(new UserLoginSuccessEvent(
+                        IdentityServerConstants.LocalIdentityProvider,
+                        customer.NormalizedUserName,
+                        customer.UserName,
+                        customer.ContactName)
+                    );
+
+                    await mediator.Send(new SignInCommand(customer, model.RememberMe), HttpContext.RequestAborted);
+
+                    if (null != context)
+                    {
+                        if (await clientStore.IsPkceClientAsync(context.ClientId))
+                        {
+                            return View("Redirect", new RedirectModel { RedirectUrl = model.ReturnUrl });
+                        }
+
+                        return Redirect(model.ReturnUrl);
+                    }
+
+                    if (Url.IsLocalUrl(model.ReturnUrl))
+                    {
+                        return Redirect(model.ReturnUrl);
+                    }
+
+                    if (String.IsNullOrEmpty(model.ReturnUrl))
+                    {
+                        return Redirect("~/");
+                    }
+
+                    var uri = new Uri(model.ReturnUrl);
+
+                    if (uri.IsAbsoluteUri)
+                    {
+                        return Redirect(model.ReturnUrl);
+                    }
+
+                    throw new Exception("Invalid redirect url");
+                }
+            }
+
+            var invalidCredentials = localizer.InvalidCredentials(context?.UiLocales);
+            await eventService.RaiseAsync(new UserLoginFailureEvent(model.Email, invalidCredentials));
+
+            ModelState.AddModelError(String.Empty, "Invalid credentials");
+
+            return View(await CreateSigninModelAsync(model));
+        }
+
+        // GET /account/error
         [HttpGet("error")]
         public async Task<IActionResult> Error([FromQuery] string errorId)
         {

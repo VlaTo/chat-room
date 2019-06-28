@@ -1,0 +1,56 @@
+{
+  "version": "1.0",
+  "defaultProvider": "cdnjs",
+  "libraries": [
+    {
+      "library": "jquery@3.4.1",
+      "destination": "wwwroot/lib/jquery",
+      "files": [
+        "jquery.slim.min.js",
+        "jquery.slim.min.map"
+      ]
+    },
+    {
+      "library": "jquery-validate@1.19.1",
+      "destination": "wwwroot/lib/jquery-validation",
+      "files": [
+        "jquery.validate.min.js"
+      ]
+    },
+    {
+      "library": "jquery-validation-unobtrusive@3.2.11",
+      "destination": "wwwroot/lib/jquery-validation-unobtrusive",
+      "files": [
+        "jquery.validate.unobtrusive.min.js"
+      ]
+    },
+    {
+      "library": "twitter-bootstrap@4.3.1",
+      "destination": "wwwroot/lib/bootstrap",
+      "files": [
+        "css/bootstrap.min.css",
+        "js/bootstrap.min.js"
+      ]
+    },
+    {
+      "library": "popper.js@1.15.0",
+      "destination": "wwwroot/lib/popper.js",
+      "files": [
+        "umd/popper.js"
+      ]
+    },
+    {
+      "library": "MaterialDesign-Webfont@3.6.95",
+      "destination": "wwwroot/lib/materialdesign-webfont",
+      "files": [
+        "css/materialdesignicons.min.css",
+        "css/materialdesignicons.css",
+        "fonts/materialdesignicons-webfont.eot",
+        "fonts/materialdesignicons-webfont.svg",
+        "fonts/materialdesignicons-webfont.ttf",
+        "fonts/materialdesignicons-webfont.woff",
+        "fonts/materialdesignicons-webfont.woff2"
+      ]
+    }
+  ]
+}

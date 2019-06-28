@@ -32,10 +32,10 @@ namespace LibraProgramming.ChatRoom.Client.UWP
     /// </summary>
     public class UwpInitializer : IPlatformInitializer
     {
-        public void RegisterTypes(IContainerRegistry container)
+        public void RegisterTypes(IContainerRegistry registry)
         {
             // Register any platform specific implementations
-            var unity = container.GetContainer();
+            var unity = registry.GetContainer();
 
             unity.AddExtension(new LoggingExtension());
 
@@ -43,9 +43,9 @@ namespace LibraProgramming.ChatRoom.Client.UWP
 
             factory.AddProvider(new DebugLoggerProvider());
 
-            container.RegisterInstance(typeof(ILogger), factory.CreateLogger("Debug"));
-            container.RegisterSingleton<IUserInformation, UwpUserInformationService>();
-            container.Register<IBrowser, WebAuthBrokerService>();
+            registry.RegisterInstance(typeof(ILogger), factory.CreateLogger("Debug"));
+            registry.RegisterSingleton<IUserInformation, UwpUserInformationService>();
+            registry.Register<IBrowser, WebAuthBrokerBrowser>();
         }
     }
 }
