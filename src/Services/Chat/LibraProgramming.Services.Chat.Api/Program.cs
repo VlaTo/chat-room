@@ -27,6 +27,7 @@ using Orleans;
 using Orleans.Configuration;
 using Orleans.Hosting;
 using System;
+using LibraProgramming.ChatRoom.Services.Chat.Api.Core.Services;
 using Microsoft.AspNetCore.Http;
 
 namespace LibraProgramming.ChatRoom.Services.Chat.Api
@@ -240,6 +241,9 @@ namespace LibraProgramming.ChatRoom.Services.Chat.Api
                     {
                         options.Cookie.Name = "Chat.Identity";
                     });
+
+                    services
+                        .AddTransient<ISigninService<Customer, long>, EntityFrameworkSigninService>();
 
                     var seed = context.Configuration.GetValue<string>("seed");
 

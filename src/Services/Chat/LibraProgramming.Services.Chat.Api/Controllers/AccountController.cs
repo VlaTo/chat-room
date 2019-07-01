@@ -8,6 +8,8 @@ using IdentityServer4.Models;
 using IdentityServer4.Services;
 using IdentityServer4.Stores;
 using LibraProgramming.ChatRoom.Services.Chat.Api.Core;
+using LibraProgramming.ChatRoom.Services.Chat.Api.Core.Commands;
+using LibraProgramming.ChatRoom.Services.Chat.Api.Core.Queries;
 using LibraProgramming.ChatRoom.Services.Chat.Api.Extensions;
 using LibraProgramming.ChatRoom.Services.Chat.Api.Models;
 using LibraProgramming.ChatRoom.Services.Chat.Persistence.Models;
@@ -109,7 +111,10 @@ namespace LibraProgramming.ChatRoom.Services.Chat.Api.Controllers
 
             if (ModelState.IsValid)
             {
-                var result = await mediator.Send(new GetCustomerQuery(model.Email, model.Password), HttpContext.RequestAborted);
+                var result = await mediator.Send(
+                    new GetCustomerQuery(model.Email, model.Password),
+                    HttpContext.RequestAborted
+                );
 
                 if (result.IsFailed)
                 {
@@ -137,12 +142,15 @@ namespace LibraProgramming.ChatRoom.Services.Chat.Api.Controllers
 
                     await eventService.RaiseAsync(new UserLoginSuccessEvent(
                         IdentityServerConstants.LocalIdentityProvider,
-                        customer.NormalizedUserName,
-                        customer.UserName,
-                        customer.ContactName)
+                        customer.Id.ToString(),
+                        customer.Email,
+                        customer.UserName)
                     );
 
-                    await mediator.Send(new SignInCommand(customer, model.RememberMe), HttpContext.RequestAborted);
+                    await mediator.Send(
+                        new SigninCommand(customer, model.RememberMe),
+                        HttpContext.RequestAborted
+                    );
 
                     if (null != context)
                     {
@@ -175,12 +183,42 @@ namespace LibraProgramming.ChatRoom.Services.Chat.Api.Controllers
                 }
             }
 
-            var invalidCredentials = localizer.InvalidCredentials(context?.UiLocales);
+            //var invalidCredentials = localizer.InvalidCredentials(context?.UiLocales);
+            var invalidCredentials = "Invalid credentials";
             await eventService.RaiseAsync(new UserLoginFailureEvent(model.Email, invalidCredentials));
 
-            ModelState.AddModelError(String.Empty, "Invalid credentials");
+            ModelState.AddModelError(String.Empty, invalidCredentials);
 
             return View(await CreateSigninModelAsync(model));
+        }
+
+        // GET account/signup
+        [HttpGet("signup")]
+        public async Task<IActionResult> Signup([FromQuery] string returnUrl)
+        {
+            var model = await CreateSignUpModelAsync(returnUrl);
+
+            return View("Signup", model);
+        }
+
+        [HttpPost("signup")]
+        [Consumes("application/x-www-form-urlencoded")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Signup([FromForm] SignUpModel model)
+        {
+            if (false == ModelState.IsValid)
+            {
+                return View("Signup", model);
+            }
+
+            if (customerManager.SupportsUserEmail)
+            {
+                var customer = new Customer();
+
+                await mediator.Send(new SendConfirmationEmailCommand(customer));
+            }
+
+            return View("Signup", new SignUpModel());
         }
 
         // GET /account/error
@@ -284,5 +322,19 @@ namespace LibraProgramming.ChatRoom.Services.Chat.Api.Controllers
 
             return model;
         }
+
+        private Task<SignUpModel> CreateSignUpModelAsync(string returnUrl)
+        {
+            var model = new SignUpModel();
+
+            return Task.FromResult(model);
+        }
+
+        /*private Task<SignUpViewModel> CreateSignUpModelAsync(SignUpModel signUp)
+        {
+            var model = new SignUpViewModel();
+
+            return Task.FromResult(model);
+        }*/
     }
 }
