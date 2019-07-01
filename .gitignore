@@ -262,3 +262,6 @@ __pycache__/
 
 # Local App Data
 **/App_Data/
+
+# Local JS scripts
+**/wwwroot/lib/
