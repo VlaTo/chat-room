@@ -55,9 +55,9 @@ namespace LibraProgramming.ChatRoom.Client
             //container.RegisterForNavigation<PrismNavigationPage>(nameof(PrismNavigationPage));
             container.RegisterForNavigation<NavigationPage>("nav");
             container.RegisterForNavigation<SignInPage, SignInPageViewModel>("signin");
-            container.RegisterForNavigation<MainPage, MainPageViewModel>(nameof(Views.MainPage));
-            container.RegisterForNavigation<LiveChatPage, LiveChatPageViewModel>(nameof(LiveChatPage));
-            container.RegisterForNavigation<AddNewRoomPage, AddNewRoomViewModel>(nameof(AddNewRoomPage));
+            container.RegisterForNavigation<MainPage, MainPageViewModel>("main");
+            container.RegisterForNavigation<LiveChatPage, LiveChatPageViewModel>("chat");
+            container.RegisterForNavigation<AddNewRoomPage, AddNewRoomViewModel>("new-room");
         }
     }
 }

@@ -1,11 +1,10 @@
-﻿using System;
-using System.Diagnostics;
-using System.Net.Http;
-using IdentityModel.OidcClient;
+﻿using IdentityModel.OidcClient;
 using IdentityModel.OidcClient.Browser;
 using LibraProgramming.ChatRoom.Client.Services;
 using Prism.Commands;
 using Prism.Navigation;
+using System;
+using System.Net.Http;
 using Xamarin.Essentials;
 
 namespace LibraProgramming.ChatRoom.Client.ViewModels
@@ -16,7 +15,6 @@ namespace LibraProgramming.ChatRoom.Client.ViewModels
     {
         private readonly IApiClient apiClient;
         private readonly OidcClientOptions options;
-        private readonly OidcClient client;
 
         public DelegateCommand SignIn
         {
@@ -45,9 +43,7 @@ namespace LibraProgramming.ChatRoom.Client.ViewModels
                     ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true
                 }
             };
-
-            client = new OidcClient(options);
-
+            
             SignIn = new DelegateCommand(OnSignInCommand);
         }
 
@@ -59,23 +55,34 @@ namespace LibraProgramming.ChatRoom.Client.ViewModels
 
         private async void OnSignInCommand()
         {
-            var result = await client.LoginAsync(new LoginRequest
-            {
-                BrowserDisplayMode = DisplayMode.Visible
-            });
+            const string accesstokenkey = "AccessToken";
+            var token = await SecureStorage.GetAsync(accesstokenkey);
 
-            if (result.IsError)
+            if (String.IsNullOrEmpty(token))
             {
-                return;
+                var client = new OidcClient(options);
+                var result = await client.LoginAsync(new LoginRequest
+                {
+                    BrowserDisplayMode = DisplayMode.Visible
+                });
+
+                if (result.IsError)
+                {
+                    return;
+                }
+
+                token = result.AccessToken;
+
+                //result.RefreshToken
+                //result.User
+
+                await SecureStorage.SetAsync(accesstokenkey, token);
+                await SecureStorage.SetAsync("RefreshToken", result.RefreshToken);
             }
 
-            //result.RefreshToken
-            //result.User
+            apiClient.SetBearerToken(token);
 
-            await SecureStorage.SetAsync("AccessToken", result.AccessToken);
-            await SecureStorage.SetAsync("RefreshToken", result.RefreshToken);
-
-            apiClient.SetBearerToken(result.AccessToken);
+            await NavigationService.NavigateAsync("nav/main");
         }
     }
 }

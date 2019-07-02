@@ -28,6 +28,7 @@ using Orleans.Configuration;
 using Orleans.Hosting;
 using System;
 using LibraProgramming.ChatRoom.Services.Chat.Api.Core.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http;
 
 namespace LibraProgramming.ChatRoom.Services.Chat.Api
@@ -120,9 +121,9 @@ namespace LibraProgramming.ChatRoom.Services.Chat.Api
                             //options.Events.RaiseErrorEvents = true;
                             //options.Events.RaiseSuccessEvents = true;
 
-                            options.UserInteraction.LoginUrl = "/Account/SignIn";
-                            options.UserInteraction.ConsentUrl = "Consent/Confirm";
-                            options.UserInteraction.ErrorUrl = "/Account/Error";
+                            options.UserInteraction.LoginUrl = "/account/signin";
+                            options.UserInteraction.ConsentUrl = "/consent/confirm";
+                            options.UserInteraction.ErrorUrl = "/account/error";
                         })
                         // https://github.com/IdentityServer/IdentityServer4/blob/44651bea9b02c992902639b21205f433aad47d03/src/IdentityServer4/src/Configuration/DependencyInjection/BuilderExtensions/Crypto.cs
                         .AddSigninCredentials(context.Configuration.GetSection("IdentityServer:Key"))
@@ -233,7 +234,27 @@ namespace LibraProgramming.ChatRoom.Services.Chat.Api
 
                     services
                         .AddOidcStateDataFormatterCache()
-                        .AddAuthentication(IdentityConstants.ApplicationScheme)
+                        .AddAuthorization(options =>
+                            options.AddPolicy(
+                                "Customers",
+                                policy => policy.RequireClaim("role", "Customer")
+                            )
+                        )
+                        //.AddAuthentication(IdentityConstants.ApplicationScheme)
+                        .AddAuthentication(options =>
+                        {
+                            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                        })
+                        .AddJwtBearer(options =>
+                        {
+                            options.Authority = "https://localhost:5001";
+                            options.RequireHttpsMetadata = true;
+
+                            options.Audience = "chat.api";
+
+                            options.TokenValidationParameters.RoleClaimType = "role";
+                        })
                         //.AddOpenIdConnect()
                         ;
 
@@ -300,11 +321,6 @@ namespace LibraProgramming.ChatRoom.Services.Chat.Api
                     );
                 }
             });
-
-            /*using (var scope = host.Services.CreateScope())
-            {
-                var services = scope.ServiceProvider;
-            }*/
 
             host.Run();
         }

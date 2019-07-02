@@ -44,7 +44,8 @@ namespace LibraProgramming.ChatRoom.Client
         private GlobalSettings()
         {
             ClientId = "xamarin.application";
-            ClientSecret = "xamarin".ToSha256();
+            //ClientSecret = "xamarin".ToSha256();
+            ClientSecret = "xamarin";
             SilentMode = false;
 
             BaseIdentityHostPath = new Uri("https://localhost:5001");

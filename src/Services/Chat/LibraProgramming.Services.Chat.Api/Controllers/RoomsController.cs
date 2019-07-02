@@ -11,6 +11,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Mime;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 
 namespace LibraProgramming.ChatRoom.Services.Chat.Api.Controllers
 {
@@ -19,7 +20,7 @@ namespace LibraProgramming.ChatRoom.Services.Chat.Api.Controllers
     /// </summary>
     [Produces(MediaTypeNames.Application.Json)]
     [Route("api/[controller]")]
-    //[ApiController]
+    [ApiController]
     public sealed class RoomsController : ControllerBase
     {
         private readonly IMediator mediator;
@@ -38,6 +39,7 @@ namespace LibraProgramming.ChatRoom.Services.Chat.Api.Controllers
         /// </summary>
         /// <returns>
         /// </returns>
+        [Authorize]
         [HttpGet]
         [ProducesResponseType(typeof(RoomsResult), (int) HttpStatusCode.OK)]
         public async Task<IActionResult> List()
